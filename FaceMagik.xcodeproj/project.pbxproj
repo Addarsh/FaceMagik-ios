@@ -16,6 +16,8 @@
 		986A64FB27E7C4870002770F /* FaceMagikTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A64FA27E7C4870002770F /* FaceMagikTests.swift */; };
 		986A650527E7C4870002770F /* FaceMagikUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A650427E7C4870002770F /* FaceMagikUITests.swift */; };
 		986A650727E7C4870002770F /* FaceMagikUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A650627E7C4870002770F /* FaceMagikUITestsLaunchTests.swift */; };
+		986A651827E7F2360002770F /* SkinToneTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 986A651727E7F2360002770F /* SkinToneTest.storyboard */; };
+		986A651A27E7F25B0002770F /* SkinToneTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651927E7F25B0002770F /* SkinToneTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		986A650027E7C4870002770F /* FaceMagikUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FaceMagikUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		986A650427E7C4870002770F /* FaceMagikUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMagikUITests.swift; sourceTree = "<group>"; };
 		986A650627E7C4870002770F /* FaceMagikUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMagikUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		986A651727E7F2360002770F /* SkinToneTest.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SkinToneTest.storyboard; sourceTree = "<group>"; };
+		986A651927E7F25B0002770F /* SkinToneTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinToneTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +107,8 @@
 				986A64E527E7C4850002770F /* SceneDelegate.swift */,
 				986A64E727E7C4850002770F /* ViewController.swift */,
 				986A64E927E7C4850002770F /* Main.storyboard */,
+				986A651727E7F2360002770F /* SkinToneTest.storyboard */,
+				986A651927E7F25B0002770F /* SkinToneTest.swift */,
 				986A64EC27E7C4870002770F /* Assets.xcassets */,
 				986A64EE27E7C4870002770F /* LaunchScreen.storyboard */,
 				986A64F127E7C4870002770F /* Info.plist */,
@@ -232,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				986A64F027E7C4870002770F /* LaunchScreen.storyboard in Resources */,
+				986A651827E7F2360002770F /* SkinToneTest.storyboard in Resources */,
 				986A64ED27E7C4870002770F /* Assets.xcassets in Resources */,
 				986A64EB27E7C4850002770F /* Main.storyboard in Resources */,
 			);
@@ -258,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				986A651A27E7F25B0002770F /* SkinToneTest.swift in Sources */,
 				986A64E827E7C4850002770F /* ViewController.swift in Sources */,
 				986A64E427E7C4850002770F /* AppDelegate.swift in Sources */,
 				986A64E627E7C4850002770F /* SceneDelegate.swift in Sources */,
