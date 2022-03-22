@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,17 +16,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleAspectFit" axis="vertical" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="OYb-fj-I3g">
-                                <rect key="frame" x="28" y="186" width="358.5" height="466"/>
+                            <stackView opaque="NO" contentMode="scaleAspectFit" axis="vertical" spacing="70" translatesAutoresizingMaskIntoConstraints="NO" id="OYb-fj-I3g">
+                                <rect key="frame" x="28" y="158" width="358.5" height="522"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use your phone's camera to find your skin tone" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zhG-dS-HVX">
-                                        <rect key="frame" x="0.0" y="0.0" width="358.5" height="56"/>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="24"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zhG-dS-HVX">
+                                        <rect key="frame" x="0.0" y="0.0" width="358.5" height="92"/>
+                                        <string key="text">Use your phone's camera
+to take pictures to find  your skin tone</string>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="phone" translatesAutoresizingMaskIntoConstraints="NO" id="a6a-SE-INJ">
-                                        <rect key="frame" x="0.0" y="106" width="358.5" height="360"/>
+                                        <rect key="frame" x="0.0" y="162" width="358.5" height="360"/>
                                     </imageView>
                                 </subviews>
                             </stackView>
@@ -34,7 +37,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" buttonSize="large">
                                     <attributedString key="attributedTitle">
-                                        <fragment content="Start">
+                                        <fragment content="Get Started">
                                             <attributes>
                                                 <font key="NSFont" size="18" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
@@ -44,6 +47,9 @@
                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <color key="baseBackgroundColor" red="0.89811862239999996" green="0.43978528909999998" blue="0.54304846939999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </buttonConfiguration>
+                                <connections>
+                                    <segue destination="HYT-vc-xVe" kind="show" id="rT7-XU-WF1"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
@@ -56,11 +62,85 @@
                             <constraint firstItem="OYb-fj-I3g" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="rSg-DH-uAC"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Skin Tone Test" id="kXp-5O-oHf"/>
+                    <navigationItem key="navigationItem" id="kXp-5O-oHf"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1047.8260869565217" y="137.94642857142856"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="WlB-8n-JrW">
+            <objects>
+                <viewController id="HYT-vc-xVe" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="QJz-OG-PDL">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="For best accuracy, make sure that" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X1s-gO-b9J">
+                                <rect key="frame" x="30" y="138" width="354" height="61"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="70" translatesAutoresizingMaskIntoConstraints="NO" id="AyX-wE-Rds">
+                                <rect key="frame" x="40" y="299" width="334" height="308"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You are in natural light. This is key for accurater skin tone detection." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mMF-aM-M4j">
+                                        <rect key="frame" x="0.0" y="0.0" width="334" height="84"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="24"/>
+                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You are indoors." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9JI-Ix-Q2D">
+                                        <rect key="frame" x="0.0" y="154" width="334" height="28"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="24"/>
+                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="All artifical light sources like lamps are turned off." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n4B-F5-Zq3">
+                                        <rect key="frame" x="0.0" y="252" width="334" height="56"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="24"/>
+                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WJQ-Ac-vt3">
+                                <rect key="frame" x="10" y="762" width="394" height="51"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" buttonSize="large">
+                                    <attributedString key="attributedTitle">
+                                        <fragment content="I'm Ready">
+                                            <attributes>
+                                                <font key="NSFont" size="18" name="Helvetica"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="baseBackgroundColor" red="0.89811862239999996" green="0.43978528909999998" blue="0.54304846939999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </buttonConfiguration>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="zDN-7S-y7p"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="X1s-gO-b9J" firstAttribute="top" secondItem="zDN-7S-y7p" secondAttribute="top" constant="50" id="75I-yT-Ewh"/>
+                            <constraint firstItem="AyX-wE-Rds" firstAttribute="top" secondItem="X1s-gO-b9J" secondAttribute="bottom" constant="100" id="8Ho-oI-yjJ"/>
+                            <constraint firstItem="zDN-7S-y7p" firstAttribute="bottom" secondItem="WJQ-Ac-vt3" secondAttribute="bottom" id="9H2-BD-JeG"/>
+                            <constraint firstItem="AyX-wE-Rds" firstAttribute="centerX" secondItem="QJz-OG-PDL" secondAttribute="centerX" id="Ob6-qh-ehh"/>
+                            <constraint firstItem="X1s-gO-b9J" firstAttribute="centerX" secondItem="QJz-OG-PDL" secondAttribute="centerX" id="OlW-My-M0b"/>
+                            <constraint firstItem="X1s-gO-b9J" firstAttribute="leading" secondItem="QJz-OG-PDL" secondAttribute="leading" constant="30" id="YSf-cl-ijM"/>
+                            <constraint firstItem="AyX-wE-Rds" firstAttribute="leading" secondItem="zDN-7S-y7p" secondAttribute="leading" constant="40" id="aC5-CL-0NT"/>
+                            <constraint firstItem="WJQ-Ac-vt3" firstAttribute="centerX" secondItem="QJz-OG-PDL" secondAttribute="centerX" id="lpK-9n-Qbc"/>
+                            <constraint firstItem="WJQ-Ac-vt3" firstAttribute="leading" secondItem="zDN-7S-y7p" secondAttribute="leading" constant="10" id="z5p-G3-JJr"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="IWc-aL-QKo"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oaD-ZM-cU9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1986.9565217391305" y="137.94642857142856"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="TZM-gn-AY1">
@@ -90,5 +170,8 @@
     </scenes>
     <resources>
         <image name="phone" width="358.5" height="360"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

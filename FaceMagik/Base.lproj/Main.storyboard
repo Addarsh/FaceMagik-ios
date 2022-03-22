@@ -23,11 +23,11 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W5M-nP-fae">
-                                <rect key="frame" x="10" y="791" width="394" height="51"/>
+                                <rect key="frame" x="10" y="781" width="394" height="51"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" buttonSize="large">
                                     <attributedString key="attributedTitle">
-                                        <fragment content="Get Started">
+                                        <fragment content="Log In">
                                             <attributes>
                                                 <font key="NSFont" size="18" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
@@ -41,9 +41,9 @@
                                     <action selector="didTapButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="XRb-nA-AaY"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Find your foundation" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbD-DU-TYo">
-                                <rect key="frame" x="87.5" y="431" width="239" height="35"/>
-                                <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="25"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Find your perfect foundation" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbD-DU-TYo">
+                                <rect key="frame" x="50.5" y="441" width="313" height="33"/>
+                                <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="24"/>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -54,8 +54,8 @@
                             <constraint firstItem="W5M-nP-fae" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="NLL-pg-ym5"/>
                             <constraint firstItem="bQZ-ZD-Qcj" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-80" id="QwT-yp-65o"/>
                             <constraint firstItem="W5M-nP-fae" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Vv4-lw-Iuu"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="W5M-nP-fae" secondAttribute="bottom" constant="20" id="aZJ-e2-TGi"/>
-                            <constraint firstItem="pbD-DU-TYo" firstAttribute="top" secondItem="bQZ-ZD-Qcj" secondAttribute="bottom" constant="40" id="baX-Oh-vMU"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="W5M-nP-fae" secondAttribute="bottom" constant="30" id="aZJ-e2-TGi"/>
+                            <constraint firstItem="pbD-DU-TYo" firstAttribute="top" secondItem="bQZ-ZD-Qcj" secondAttribute="bottom" constant="50" id="baX-Oh-vMU"/>
                             <constraint firstItem="bQZ-ZD-Qcj" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="pAO-Wn-XzL"/>
                             <constraint firstItem="pbD-DU-TYo" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="t9j-Rj-OH2"/>
                         </constraints>
