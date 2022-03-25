@@ -36,10 +36,14 @@ class SkinToneDetectionSession: UIViewController {
     private let notifCenter = NotificationCenter.default
     private let captureSessionQueue = DispatchQueue(label: "user video queue", qos: .userInteractive, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     
+    // Skin tone session variables.
+    var backendService: BackendService?
+    var sessionId = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        backendService = BackendService(sessionResponseHandler: self)
 
         if !isCameraUseAuthorized() {
             return
@@ -119,6 +123,14 @@ class SkinToneDetectionSession: UIViewController {
         return true
     }
     
+    @IBAction func didTapButton(_ sender: UIButton) {
+        guard let backendService = backendService else {
+            return
+        }
+        backendService.createSkinToneSession()
+    }
+    
+    
     @objc private func appMovedToBackground() {
         notifCenter.removeObserver(self)
         // Pop view.
@@ -132,6 +144,14 @@ class SkinToneDetectionSession: UIViewController {
     }
     
 }
+
+extension SkinToneDetectionSession: SessionResponseHandler {
+    func onSessionCreation(sessionId: String) {
+        self.sessionId = sessionId
+        print ("Created session with id: \(sessionId)")
+    }
+}
+
 
 class PreviewView: UIView {
     override class var layerClass: AnyClass {
