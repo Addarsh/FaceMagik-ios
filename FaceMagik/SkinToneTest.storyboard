@@ -120,7 +120,7 @@
                                         </fragment>
                                     </attributedString>
                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <color key="baseBackgroundColor" red="0.89811862239999996" green="0.43978528909999998" blue="0.54304846939999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="baseBackgroundColor" red="0.89803921568627454" green="0.4392156862745098" blue="0.54117647058823526" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </buttonConfiguration>
                                 <connections>
                                     <segue destination="6jB-e1-b8Q" kind="show" id="Ogm-rJ-e6V"/>
@@ -184,11 +184,32 @@
                                 <rect key="frame" x="0.0" y="168" width="414" height="545"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CZQ-Xl-NuB">
+                                <rect key="frame" x="162" y="733" width="90" height="90"/>
+                                <color key="backgroundColor" red="0.89803921568627454" green="0.4392156862745098" blue="0.54117647058823526" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="90" id="X7e-EG-sw4"/>
+                                    <constraint firstAttribute="width" constant="90" id="w6f-OM-U1e"/>
+                                </constraints>
+                                <color key="tintColor" red="0.8980392157" green="0.43921568630000002" blue="0.54117647059999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled">
+                                    <color key="baseBackgroundColor" red="0.8980392157" green="0.43921568630000002" blue="0.54117647059999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </buttonConfiguration>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="45"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="clipsToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="5Gr-yb-vhq"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="top" secondItem="5Gr-yb-vhq" secondAttribute="top" constant="80" id="0rT-f0-82S"/>
+                            <constraint firstItem="CZQ-Xl-NuB" firstAttribute="centerX" secondItem="1zb-tA-NzZ" secondAttribute="centerX" id="BKz-7N-BSc"/>
+                            <constraint firstItem="CZQ-Xl-NuB" firstAttribute="top" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="20" id="FDd-vW-lRc"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="Yts-GG-FOD" secondAttribute="trailing" id="hCc-Mi-oEr"/>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" id="wdw-WA-OIh"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="bottom" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="100" id="xjy-tm-5tp"/>
