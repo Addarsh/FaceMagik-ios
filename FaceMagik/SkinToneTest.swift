@@ -27,16 +27,25 @@ class SkinToneTest: UIViewController {
 
 class SkinToneDetectionSession: UIViewController {
     
+    enum SessionState {
+        case NOT_STARTED
+        case RUNNING
+        case COMPLETE
+    }
+    
+    // Outlets to Storyboard.
+    @IBOutlet weak var sessionLabel: UILabel!
     @IBOutlet private var previewView: PreviewView!
     
     // Camera variables.
     private let captureSession = AVCaptureSession()
     private let videoOutput = AVCaptureVideoDataOutput()
-    
     private let notifCenter = NotificationCenter.default
     private let captureSessionQueue = DispatchQueue(label: "user video queue", qos: .userInteractive, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     
     // Skin tone session variables.
+    private let backendServiceQueue = DispatchQueue(label: "backend service queue", qos: .default, attributes: [], autoreleaseFrequency: .inherit, target: nil)
+    var sessionState = SessionState.NOT_STARTED
     var backendService: BackendService?
     var sessionId = ""
     
@@ -124,10 +133,17 @@ class SkinToneDetectionSession: UIViewController {
     }
     
     @IBAction func didTapButton(_ sender: UIButton) {
-        guard let backendService = backendService else {
-            return
+        backendServiceQueue.async {
+            guard let backendService = self.backendService else {
+                print ("Backend service not found")
+                return
+            }
+            if (self.sessionState == SessionState.NOT_STARTED) {
+                backendService.createSkinToneSession()
+            } else {
+                print ("Session already in progress")
+            }
         }
-        backendService.createSkinToneSession()
     }
     
     
@@ -147,8 +163,15 @@ class SkinToneDetectionSession: UIViewController {
 
 extension SkinToneDetectionSession: SessionResponseHandler {
     func onSessionCreation(sessionId: String) {
-        self.sessionId = sessionId
-        print ("Created session with id: \(sessionId)")
+        
+        backendServiceQueue.async {
+            self.sessionId = sessionId
+            self.sessionState = SessionState.RUNNING
+        }
+        
+        DispatchQueue.main.async {
+            self.sessionLabel.text = "Session Running"
+        }
     }
 }
 

@@ -206,13 +206,21 @@
                                     <action selector="didTapButton:" destination="6jB-e1-b8Q" eventType="touchUpInside" id="ptc-DA-cxg"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2tH-Ce-pgp">
+                                <rect key="frame" x="404" y="158" width="0.0" height="0.0"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <color key="textColor" systemColor="systemGreenColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="5Gr-yb-vhq"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="top" secondItem="5Gr-yb-vhq" secondAttribute="top" constant="80" id="0rT-f0-82S"/>
+                            <constraint firstItem="Yts-GG-FOD" firstAttribute="top" secondItem="2tH-Ce-pgp" secondAttribute="bottom" constant="10" id="7bN-jK-b2l"/>
                             <constraint firstItem="CZQ-Xl-NuB" firstAttribute="centerX" secondItem="1zb-tA-NzZ" secondAttribute="centerX" id="BKz-7N-BSc"/>
                             <constraint firstItem="CZQ-Xl-NuB" firstAttribute="top" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="20" id="FDd-vW-lRc"/>
+                            <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="2tH-Ce-pgp" secondAttribute="trailing" constant="10" id="Jgz-r9-fco"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="Yts-GG-FOD" secondAttribute="trailing" id="hCc-Mi-oEr"/>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" id="wdw-WA-OIh"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="bottom" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="100" id="xjy-tm-5tp"/>
@@ -221,6 +229,7 @@
                     <navigationItem key="navigationItem" id="kmd-CA-eVe"/>
                     <connections>
                         <outlet property="previewView" destination="Yts-GG-FOD" id="RUG-NW-GIt"/>
+                        <outlet property="sessionLabel" destination="2tH-Ce-pgp" id="Kqf-G1-H4b"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sdH-V6-wRS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -232,6 +241,9 @@
         <image name="phone" width="358.5" height="360"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
