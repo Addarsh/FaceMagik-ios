@@ -20,6 +20,7 @@
 		986A651A27E7F25B0002770F /* SkinToneTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651927E7F25B0002770F /* SkinToneTest.swift */; };
 		986A651C27ED5DC40002770F /* BackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651B27ED5DC40002770F /* BackendService.swift */; };
 		986A651E27EE776A0002770F /* SessionResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651D27EE77690002770F /* SessionResponseHandler.swift */; };
+		986A652027EF6F850002770F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651F27EF6F850002770F /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		986A651927E7F25B0002770F /* SkinToneTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinToneTest.swift; sourceTree = "<group>"; };
 		986A651B27ED5DC40002770F /* BackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendService.swift; sourceTree = "<group>"; };
 		986A651D27EE77690002770F /* SessionResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionResponseHandler.swift; sourceTree = "<group>"; };
+		986A651F27EF6F850002770F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 				986A651927E7F25B0002770F /* SkinToneTest.swift */,
 				986A651B27ED5DC40002770F /* BackendService.swift */,
 				986A651D27EE77690002770F /* SessionResponseHandler.swift */,
+				986A651F27EF6F850002770F /* Utils.swift */,
 				986A64EC27E7C4870002770F /* Assets.xcassets */,
 				986A64EE27E7C4870002770F /* LaunchScreen.storyboard */,
 				986A64F127E7C4870002770F /* Info.plist */,
@@ -274,6 +277,7 @@
 				986A651A27E7F25B0002770F /* SkinToneTest.swift in Sources */,
 				986A64E827E7C4850002770F /* ViewController.swift in Sources */,
 				986A651E27EE776A0002770F /* SessionResponseHandler.swift in Sources */,
+				986A652027EF6F850002770F /* Utils.swift in Sources */,
 				986A64E427E7C4850002770F /* AppDelegate.swift in Sources */,
 				986A64E627E7C4850002770F /* SceneDelegate.swift in Sources */,
 				986A651C27ED5DC40002770F /* BackendService.swift in Sources */,

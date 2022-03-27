@@ -7,4 +7,5 @@
 
 protocol SessionResponseHandler {
     func onSessionCreation(sessionId: String)
+    func userNavigationInstruction(instruction: String)
 }

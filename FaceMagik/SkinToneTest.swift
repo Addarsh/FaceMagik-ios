@@ -35,6 +35,7 @@ class SkinToneDetectionSession: UIViewController {
     
     // Outlets to Storyboard.
     @IBOutlet weak var sessionLabel: UILabel!
+    @IBOutlet weak var navigationLabel: UILabel!
     @IBOutlet private var previewView: PreviewView!
     
     // Camera variables.
@@ -42,12 +43,15 @@ class SkinToneDetectionSession: UIViewController {
     private let videoOutput = AVCaptureVideoDataOutput()
     private let notifCenter = NotificationCenter.default
     private let captureSessionQueue = DispatchQueue(label: "user video queue", qos: .userInteractive, attributes: [], autoreleaseFrequency: .inherit, target: nil)
+    private let videoOutputQueue = DispatchQueue(label: "output video frames queue")
     
     // Skin tone session variables.
     private let backendServiceQueue = DispatchQueue(label: "backend service queue", qos: .default, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     var sessionState = SessionState.NOT_STARTED
     var backendService: BackendService?
     var sessionId = ""
+    var lastInstruction = ""
+    var lastImage: CIImage?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +131,7 @@ class SkinToneDetectionSession: UIViewController {
             print ("Could not initialize camera output")
             return false
         }
+        videoOutput.setSampleBufferDelegate(self, queue: videoOutputQueue)
         captureSession.addOutput(videoOutput)
         
         return true
@@ -138,10 +143,17 @@ class SkinToneDetectionSession: UIViewController {
                 print ("Backend service not found")
                 return
             }
-            if (self.sessionState == SessionState.NOT_STARTED) {
+            switch(self.sessionState) {
+            case SessionState.NOT_STARTED:
                 backendService.createSkinToneSession()
-            } else {
-                print ("Session already in progress")
+            case SessionState.RUNNING:
+                guard let ciImage = self.lastImage else {
+                    print ("Last image not found")
+                    return
+                }
+                backendService.detectskinTone(sessionId: self.sessionId, ciImage: ciImage)
+            case SessionState.COMPLETE:
+                print ("Session complete")
             }
         }
     }
@@ -171,6 +183,30 @@ extension SkinToneDetectionSession: SessionResponseHandler {
         
         DispatchQueue.main.async {
             self.sessionLabel.text = "Session Running"
+        }
+    }
+    
+    func userNavigationInstruction(instruction: String) {
+        backendServiceQueue.async {
+            self.lastInstruction = instruction
+            
+            DispatchQueue.main.async {
+                self.navigationLabel.text = instruction
+            }
+        }
+    }
+}
+
+extension SkinToneDetectionSession: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        guard let cvImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            print ("Could not get CVImageBuffer from sample buffer")
+            return
+        }
+        
+        let ciImage = CIImage(cvImageBuffer: cvImageBuffer)
+        backendServiceQueue.async {
+            self.lastImage = ciImage
         }
     }
 }
