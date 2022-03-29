@@ -49,14 +49,17 @@ class SkinToneDetectionSession: UIViewController {
     private let backendServiceQueue = DispatchQueue(label: "backend service queue", qos: .default, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     var sessionState = SessionState.NOT_STARTED
     var backendService: BackendService?
+    var faceMaskDetector: FaceMaskDetector?
     var sessionId = ""
     var lastInstruction = ""
     var lastImage: CIImage?
+    var lastImageSampleBuffer: CMSampleBuffer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         backendService = BackendService(sessionResponseHandler: self)
+        faceMaskDetector = FaceMaskDetector(faceMaskDelegate: self)
 
         if !isCameraUseAuthorized() {
             return
@@ -143,6 +146,12 @@ class SkinToneDetectionSession: UIViewController {
                 print ("Backend service not found")
                 return
             }
+            guard let faceMaskDetector = self.faceMaskDetector else {
+                print ("Face Mask detector not found")
+                return
+            }
+
+
             switch(self.sessionState) {
             case SessionState.NOT_STARTED:
                 backendService.createSkinToneSession()
@@ -151,7 +160,11 @@ class SkinToneDetectionSession: UIViewController {
                     print ("Last image not found")
                     return
                 }
-                backendService.detectskinTone(sessionId: self.sessionId, ciImage: ciImage)
+                guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
+                    print ("UIImage resize failed")
+                    return
+                }
+                faceMaskDetector.detect(uiImage: uiImage)
             case SessionState.COMPLETE:
                 print ("Session complete")
             }
@@ -171,6 +184,26 @@ class SkinToneDetectionSession: UIViewController {
         }
     }
     
+}
+
+extension SkinToneDetectionSession: FaceMaskDelegate {
+    func detectedfaceMask(faceMask: UIImage) {
+        backendServiceQueue.async {
+            guard let backendService = self.backendService else {
+                print ("Backend service not found")
+                return
+            }
+            guard let ciImage = self.lastImage else {
+                print ("Last image not found")
+                return
+            }
+            guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
+                print ("UIImage resize failed")
+                return
+            }
+            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, faceMask: faceMask)
+        }
+    }
 }
 
 extension SkinToneDetectionSession: SessionResponseHandler {
@@ -206,6 +239,7 @@ extension SkinToneDetectionSession: AVCaptureVideoDataOutputSampleBufferDelegate
         
         let ciImage = CIImage(cvImageBuffer: cvImageBuffer)
         backendServiceQueue.async {
+            self.lastImageSampleBuffer = sampleBuffer
             self.lastImage = ciImage
         }
     }
