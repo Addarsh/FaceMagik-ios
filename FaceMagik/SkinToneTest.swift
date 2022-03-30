@@ -187,21 +187,21 @@ class SkinToneDetectionSession: UIViewController {
 }
 
 extension SkinToneDetectionSession: FaceMaskDelegate {
-    func detectedfaceMask(faceMask: UIImage) {
+    func detectedfaceMask(faceMask: UIImage, mouthMask: UIImage) {
         backendServiceQueue.async {
             guard let backendService = self.backendService else {
                 print ("Backend service not found")
                 return
             }
-            guard let ciImage = self.lastImage else {
+            guard let lastImage = self.lastImage else {
                 print ("Last image not found")
                 return
             }
-            guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
+            guard let lastUIImage = UIImage(ciImage: lastImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
                 print ("UIImage resize failed")
                 return
             }
-            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, faceMask: faceMask)
+            backendService.detectskinTone(sessionId: self.sessionId, uiImage: lastUIImage, faceMask: faceMask, mouthMask: mouthMask)
         }
     }
 }

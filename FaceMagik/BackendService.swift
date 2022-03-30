@@ -21,6 +21,8 @@ class BackendService {
         let image: String
         // Face Mask is a Base64 encodeded string.
         let face_mask: String
+        // Mouth Mask is a Base64 encodeded string.
+        let mouth_mask: String
     }
     
     struct SkinToneDetectionResponse: Codable {
@@ -104,7 +106,7 @@ class BackendService {
         
     }
     
-    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage) {
+    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage) {
         let postURL = HTTPS_PREFIX + DOMAIN_PREFIX + DOMAIN + ENDPOINT
         guard let url = URL(string: postURL) else {
             print ("Could not initialize URL string: \(postURL)")
@@ -117,7 +119,8 @@ class BackendService {
         
         let base64Image = Utils.tobase64String(uiImage: uiImage)
         let faceMaskbase64 = Utils.tobase64String(uiImage: faceMask)
-        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64)
+        let mouthMaskbase64 = Utils.tobase64String(uiImage: mouthMask)
+        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64, mouth_mask: mouthMaskbase64)
         
         var jsonBody: Data
         do {

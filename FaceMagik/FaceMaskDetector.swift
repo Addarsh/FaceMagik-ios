@@ -48,16 +48,25 @@ class FaceMaskDetector {
             }
             
             let face = faces[0]
-            guard let ciImage = self.createFaceMaskTillNoseEnd(face: face, uiImage: uiImage) else {
-                print ("Could not create Contour mask")
+            guard let faceMaskImage = self.createFaceMaskTillNoseEnd(face: face, uiImage: uiImage) else {
+                print ("Could not create face Contour mask")
+                return
+            }
+            guard let mouthMaskImage = self.createMouthMask(face: face, uiImage: uiImage) else {
+                print ("Could not create mouth Contour mask")
                 return
             }
             
-            guard let faceMask = UIImage(ciImage: ciImage).resized(toWidth: 720) else {
-                print ("UIImage resize failed in face detecor")
+            guard let faceMask = UIImage(ciImage: faceMaskImage).resized(toWidth: 720) else {
+                print ("UIImage resize failed for face mask")
                 return
             }
-            self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask)
+            guard let mouthMask = UIImage(ciImage: mouthMaskImage).resized(toWidth: 720) else {
+                print ("UIImage resize failed for mouth mask")
+                return
+            }
+            
+            self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask, mouthMask: mouthMask)
         }
     }
     
@@ -90,6 +99,17 @@ class FaceMaskDetector {
         out = bitwiseXor(firstMask: out, secondMask: rightEyeMask)
         out = bitwiseXor(firstMask: out, secondMask: leftEyebrowMask)
         return bitwiseXor(firstMask: out, secondMask: rightEyebrowMask)
+    }
+    
+    // Create mouth mask
+    private func createMouthMask(face: Face, uiImage: UIImage) -> CIImage? {
+        let faceContours = face.contours
+        
+        guard let mouthWithoutLipsMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.upperLipBottom, faceContourTwo: FaceContourType.lowerLipTop, reverse: false) else {
+            print ("Could not create mouth without lips mask")
+            return nil
+        }
+        return mouthWithoutLipsMask
     }
     
     // Creates a face mask without eyes, eyebrows and mouth. This will mostly not be sent to server since it can include beard for men as well.

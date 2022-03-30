@@ -10,5 +10,5 @@ import CoreImage
 import UIKit
 
 protocol FaceMaskDelegate {
-    func detectedfaceMask(faceMask: UIImage)
+    func detectedfaceMask(faceMask: UIImage, mouthMask: UIImage)
 }
