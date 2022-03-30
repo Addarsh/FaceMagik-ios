@@ -12,6 +12,8 @@ import CoreImage.CIFilterBuiltins
 
 class FaceMaskDetector {
     
+    let TOTAL_FACE_CONTOUR_POINTS = 36
+    
     var faceDetector: FaceDetector?
     var faceMaskDelegate: FaceMaskDelegate?
     
@@ -46,7 +48,7 @@ class FaceMaskDetector {
             }
             
             let face = faces[0]
-            guard let ciImage = self.createFaceMask(face: face, uiImage: uiImage) else {
+            guard let ciImage = self.createFaceMaskTillNoseEnd(face: face, uiImage: uiImage) else {
                 print ("Could not create Contour mask")
                 return
             }
@@ -59,9 +61,42 @@ class FaceMaskDetector {
         }
     }
     
-    // Creates a face mask without eyes, eyebrows and mouth.
+    // Create face mask up to nose end excluding eyes and eyebrows. Skin under the nose will always be excluded.
+    // This is to ensure that we don't have to differentiate potential facial hair from skin.
+    private func createFaceMaskTillNoseEnd(face: Face, uiImage: UIImage) -> CIImage? {
+        let faceContours = face.contours
+        
+        guard let faceMaskTillNoseEnd = createFaceMaskTillNoseEnd(faceContours: faceContours, uiImage: uiImage) else {
+            print ("Could not create face mask till nose end contour mask")
+            return nil
+        }
+        guard let leftEyeMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.leftEye) else {
+            print ("Could not create left eye contour mask")
+            return nil
+        }
+        guard let rightEyeMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.rightEye) else {
+            print ("Could not create right eye contour mask")
+            return nil
+        }
+        guard let leftEyebrowMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.leftEyebrowTop, faceContourTwo: FaceContourType.leftEyebrowBottom, reverse: true) else {
+            print ("Could not create left eyebrow mask")
+            return nil
+        }
+        guard let rightEyebrowMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.rightEyebrowTop, faceContourTwo: FaceContourType.rightEyebrowBottom, reverse: true) else {
+            print ("Could not create right eyebrow mask")
+            return nil
+        }
+        var out = bitwiseXor(firstMask: faceMaskTillNoseEnd, secondMask: leftEyeMask)
+        out = bitwiseXor(firstMask: out, secondMask: rightEyeMask)
+        out = bitwiseXor(firstMask: out, secondMask: leftEyebrowMask)
+        return bitwiseXor(firstMask: out, secondMask: rightEyebrowMask)
+    }
+    
+    // Creates a face mask without eyes, eyebrows and mouth. This will mostly not be sent to server since it can include beard for men as well.
+    // We will instead try to send mask up to the face nose point.
     private func createFaceMask(face: Face, uiImage: UIImage) -> CIImage? {
         let faceContours = face.contours
+        
         guard let faceMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.face) else {
             print ("Could not create face contour mask")
             return nil
@@ -94,6 +129,27 @@ class FaceMaskDetector {
         return bitwiseXor(firstMask: out, secondMask: mouthWithLipsMask)
     }
     
+    // Creates face mask until nose end. It will include eyes and eyebrows.
+    private func createFaceMaskTillNoseEnd(faceContours: [FaceContour], uiImage: UIImage) -> CIImage? {
+        guard let contour = validateContourType(faceContours: faceContours, faceContourType: FaceContourType.face) else {
+            print ("Failed to validate contour type: face")
+            return nil
+        }
+        guard let noseBottomContour = validateContourType(faceContours: faceContours, faceContourType: FaceContourType.noseBottom) else {
+            print ("Failed to validate contour type: noseBottom")
+            return nil
+        }
+        if contour.points.count != TOTAL_FACE_CONTOUR_POINTS {
+            print ("Expected \(TOTAL_FACE_CONTOUR_POINTS) face contour points, got \(contour.points.count) points")
+            return nil
+        }
+        // Pick the contour points 26-36, 0-10 from the face. Then pick points 2-0 (in that order) from the nose bottom.
+        // This sequence will give us face mask until nose end.
+        let contourPoints = Array(contour.points[26...]) + Array(contour.points[0..<11]) + noseBottomContour.points.reversed()
+        
+        return createContourMask(uiImage: uiImage, contourPoints: contourPoints)
+    }
+    
     // Creates a mask of given contour type.
     private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourType: FaceContourType) -> CIImage? {
         guard let contour = validateContourType(faceContours: faceContours, faceContourType: faceContourType) else {
@@ -103,7 +159,7 @@ class FaceMaskDetector {
         return createContourMask(uiImage: uiImage, contourPoints: contour.points)
     }
     
-    // Creates a mask combining given contour types.
+    // Creates a mask combining given two contour types.
     private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourOne: FaceContourType, faceContourTwo: FaceContourType, reverse: Bool) -> CIImage? {
         guard let contourOne = validateContourType(faceContours: faceContours, faceContourType: faceContourOne) else {
             print ("Failed to validate contour type: \(faceContourOne)")
