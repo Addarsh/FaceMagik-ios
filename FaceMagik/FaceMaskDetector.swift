@@ -59,7 +59,7 @@ class FaceMaskDetector {
         }
     }
     
-    // Creates a face mask without eyes.
+    // Creates a face mask without eyes, eyebrows and mouth.
     private func createFaceMask(face: Face, uiImage: UIImage) -> CIImage? {
         let faceContours = face.contours
         guard let faceMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.face) else {
@@ -74,21 +74,48 @@ class FaceMaskDetector {
             print ("Could not create right eye contour mask")
             return nil
         }
+        guard let leftEyebrowMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.leftEyebrowTop, faceContourTwo: FaceContourType.leftEyebrowBottom, reverse: true) else {
+            print ("Could not create left eyebrow mask")
+            return nil
+        }
+        guard let rightEyebrowMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.rightEyebrowTop, faceContourTwo: FaceContourType.rightEyebrowBottom, reverse: true) else {
+            print ("Could not create right eyebrow mask")
+            return nil
+        }
+        guard let mouthWithLipsMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourOne: FaceContourType.upperLipTop, faceContourTwo: FaceContourType.lowerLipBottom, reverse: false) else {
+            print ("Could not create mouth with lips mask")
+            return nil
+        }
         
-        let out = bitwiseXor(firstMask: faceMask, secondMask: leftEyeMask)
-        return bitwiseXor(firstMask: out, secondMask: rightEyeMask)
+        var out = bitwiseXor(firstMask: faceMask, secondMask: leftEyeMask)
+        out = bitwiseXor(firstMask: out, secondMask: rightEyeMask)
+        out = bitwiseXor(firstMask: out, secondMask: leftEyebrowMask)
+        out = bitwiseXor(firstMask: out, secondMask: rightEyebrowMask)
+        return bitwiseXor(firstMask: out, secondMask: mouthWithLipsMask)
     }
     
     // Creates a mask of given contour type.
     private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourType: FaceContourType) -> CIImage? {
-        let contours = faceContours.filter({$0.type == faceContourType})
-        if contours.count != 1 {
-            print ("Expected 1 contour for type: \(faceContourType), got \(contours.count) contours")
+        guard let contour = validateContourType(faceContours: faceContours, faceContourType: faceContourType) else {
+            print ("Failed to validate contour type: \(faceContourType)")
+            return nil
+        }
+        return createContourMask(uiImage: uiImage, contourPoints: contour.points)
+    }
+    
+    // Creates a mask combining given contour types.
+    private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourOne: FaceContourType, faceContourTwo: FaceContourType, reverse: Bool) -> CIImage? {
+        guard let contourOne = validateContourType(faceContours: faceContours, faceContourType: faceContourOne) else {
+            print ("Failed to validate contour type: \(faceContourOne)")
             return nil
         }
         
-        let contourPoints = contours[0].points
-        return createContourMask(uiImage: uiImage, contourPoints: contourPoints)
+        guard let contourTwo = validateContourType(faceContours: faceContours, faceContourType: faceContourTwo) else {
+            print ("Failed to validate contour type: \(faceContourTwo)")
+            return nil
+        }
+        let joinedContourPoints = joinContourPoints(firstPoints: contourOne.points, secondPoints: contourTwo.points, reverse: reverse)
+        return createContourMask(uiImage: uiImage, contourPoints: joinedContourPoints)
     }
     
     
@@ -122,6 +149,26 @@ class FaceMaskDetector {
             return nil
         }
         return CIImage(cgImage: cgImage)
+    }
+    
+    
+    // Returns combined contour points so the resultant list of points is a closed set spanning 360 degrees.
+    // Will be used for eyebrows and lips.
+    private func joinContourPoints(firstPoints: [VisionPoint], secondPoints: [VisionPoint], reverse: Bool) -> [VisionPoint] {
+        if (reverse) {
+            return firstPoints + secondPoints.reversed()
+        }
+        return firstPoints + secondPoints
+    }
+    
+    
+    private func validateContourType(faceContours: [FaceContour], faceContourType: FaceContourType) -> FaceContour? {
+        let contours = faceContours.filter({$0.type == faceContourType})
+        if contours.count != 1 {
+            print ("Expected 1 contour for type: \(faceContourType), got \(contours.count) contours")
+            return nil
+        }
+        return contours[0]
     }
     
     // bitwiseXor returns a mask that applies the bitwise XOR operation on given masks.
