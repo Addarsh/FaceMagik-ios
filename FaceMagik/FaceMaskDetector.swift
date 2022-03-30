@@ -8,6 +8,7 @@
 import Foundation
 import MLKit
 import UIKit
+import CoreImage.CIFilterBuiltins
 
 class FaceMaskDetector {
     
@@ -45,15 +46,7 @@ class FaceMaskDetector {
             }
             
             let face = faces[0]
-            
-            let faceContours = face.contours.filter({$0.type == FaceContourType.face})
-            if faceContours.count != 1 {
-                print ("Expected 1 face contour, got \(faceContours.count) contours")
-                return
-            }
-            
-            let contourPoints = faceContours[0].points
-            guard let ciImage = self.createContourMask(uiImage: uiImage, contourPoints: contourPoints) else {
+            guard let ciImage = self.createFaceMask(face: face, uiImage: uiImage) else {
                 print ("Could not create Contour mask")
                 return
             }
@@ -64,6 +57,38 @@ class FaceMaskDetector {
             }
             self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask)
         }
+    }
+    
+    // Creates a face mask without eyes.
+    private func createFaceMask(face: Face, uiImage: UIImage) -> CIImage? {
+        let faceContours = face.contours
+        guard let faceMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.face) else {
+            print ("Could not create face contour mask")
+            return nil
+        }
+        guard let leftEyeMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.leftEye) else {
+            print ("Could not create left eye contour mask")
+            return nil
+        }
+        guard let rightEyeMask = createContourMask(faceContours: faceContours, uiImage: uiImage, faceContourType: FaceContourType.rightEye) else {
+            print ("Could not create right eye contour mask")
+            return nil
+        }
+        
+        let out = bitwiseXor(firstMask: faceMask, secondMask: leftEyeMask)
+        return bitwiseXor(firstMask: out, secondMask: rightEyeMask)
+    }
+    
+    // Creates a mask of given contour type.
+    private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourType: FaceContourType) -> CIImage? {
+        let contours = faceContours.filter({$0.type == faceContourType})
+        if contours.count != 1 {
+            print ("Expected 1 contour for type: \(faceContourType), got \(contours.count) contours")
+            return nil
+        }
+        
+        let contourPoints = contours[0].points
+        return createContourMask(uiImage: uiImage, contourPoints: contourPoints)
     }
     
     
@@ -99,5 +124,12 @@ class FaceMaskDetector {
         return CIImage(cgImage: cgImage)
     }
     
+    // bitwiseXor returns a mask that applies the bitwise XOR operation on given masks.
+    private func bitwiseXor(firstMask: CIImage?, secondMask: CIImage?) -> CIImage? {
+        let comp = CIFilter.differenceBlendMode()
+        comp.backgroundImage = firstMask
+        comp.inputImage = secondMask
+        return comp.outputImage
+    }
     
 }
