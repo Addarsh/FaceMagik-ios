@@ -13,6 +13,7 @@ import CoreImage.CIFilterBuiltins
 class FaceMaskDetector {
     
     let TOTAL_FACE_CONTOUR_POINTS = 36
+    let TOTAL_NOSE_BRIDGE_CONTOUR_POINTS = 2
     
     var faceDetector: FaceDetector?
     var faceMaskDelegate: FaceMaskDelegate?
@@ -56,17 +57,38 @@ class FaceMaskDetector {
                 print ("Could not create mouth Contour mask")
                 return
             }
+            guard let leftEyeMask = self.createContourMask(faceContours: face.contours, uiImage: uiImage, faceContourType: FaceContourType.leftEye) else {
+                print ("Could not create left eye contour mask")
+                return
+            }
+            guard let rightEyeMask = self.createContourMask(faceContours: face.contours, uiImage: uiImage, faceContourType: FaceContourType.rightEye) else {
+                print ("Could not create right eye contour mask")
+                return
+            }
+            guard let noseMiddlePoint = self.noseMiddlePoint(face: face, uiImage: uiImage) else {
+                print ("Could not get nose middle point")
+                return
+            }
             
-            guard let faceMask = UIImage(ciImage: faceMaskImage).resized(toWidth: 720) else {
+            let resizedWidth = CGFloat(720)
+            guard let faceMask = UIImage(ciImage: faceMaskImage).resized(toWidth: resizedWidth) else {
                 print ("UIImage resize failed for face mask")
                 return
             }
-            guard let mouthMask = UIImage(ciImage: mouthMaskImage).resized(toWidth: 720) else {
+            guard let mouthMask = UIImage(ciImage: mouthMaskImage).resized(toWidth: resizedWidth) else {
                 print ("UIImage resize failed for mouth mask")
                 return
             }
+            guard let leftEyeMask = UIImage(ciImage: leftEyeMask).resized(toWidth: resizedWidth) else {
+                print ("UIImage resize failed for left Eye mask")
+                return
+            }
+            guard let rightEyeMask = UIImage(ciImage: rightEyeMask).resized(toWidth: resizedWidth) else {
+                print ("UIImage resize failed for right Eye mask")
+                return
+            }
             
-            self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask, mouthMask: mouthMask)
+            self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddlePoint)
         }
     }
     
@@ -110,6 +132,24 @@ class FaceMaskDetector {
             return nil
         }
         return mouthWithoutLipsMask
+    }
+    
+    private func noseMiddlePoint(face: Face, uiImage: UIImage) -> [Int]? {
+        guard let contour = validateContourType(faceContours: face.contours, faceContourType: FaceContourType.noseBridge) else {
+            print ("Failed to validate contour type: noseBridge")
+            return nil
+        }
+        if contour.points.count != TOTAL_NOSE_BRIDGE_CONTOUR_POINTS {
+            print ("Expected \(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS) nose bridge contour points, got \(contour.points.count) points")
+            return nil
+        }
+        print ("nose bridge countour points: \(contour.points)")
+        
+        let xSum = contour.points.map{$0.x}.reduce(0, +)
+        let ySum = contour.points.map{$0.y}.reduce(0, +)
+        let midPoint = [Int(xSum/CGFloat(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS)), Int(ySum/CGFloat(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS))]
+        print ("nose mid point: \(midPoint)")
+        return midPoint
     }
     
     // Creates a face mask without eyes, eyebrows and mouth. This will mostly not be sent to server since it can include beard for men as well.

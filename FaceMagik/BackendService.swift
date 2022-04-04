@@ -23,6 +23,11 @@ class BackendService {
         let face_mask: String
         // Mouth Mask is a Base64 encodeded string.
         let mouth_mask: String
+        // Left Eye Mask is a Base64 encodeded string.
+        let left_eye_mask: String
+        // Right Eye Mask is a Base64 encodeded string.
+        let right_eye_mask: String
+        let nose_middle_point: [Int]
     }
     
     struct SkinToneDetectionResponse: Codable {
@@ -106,7 +111,7 @@ class BackendService {
         
     }
     
-    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage) {
+    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int]) {
         let postURL = HTTPS_PREFIX + DOMAIN_PREFIX + DOMAIN + ENDPOINT
         guard let url = URL(string: postURL) else {
             print ("Could not initialize URL string: \(postURL)")
@@ -120,7 +125,9 @@ class BackendService {
         let base64Image = Utils.tobase64String(uiImage: uiImage)
         let faceMaskbase64 = Utils.tobase64String(uiImage: faceMask)
         let mouthMaskbase64 = Utils.tobase64String(uiImage: mouthMask)
-        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64, mouth_mask: mouthMaskbase64)
+        let leftEyeMaskbase64 = Utils.tobase64String(uiImage: leftEyeMask)
+        let rightEyeMaskbase64 = Utils.tobase64String(uiImage: rightEyeMask)
+        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64, mouth_mask: mouthMaskbase64, left_eye_mask: leftEyeMaskbase64, right_eye_mask: rightEyeMaskbase64, nose_middle_point: noseMiddePoint)
         
         var jsonBody: Data
         do {
