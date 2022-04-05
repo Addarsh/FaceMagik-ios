@@ -54,6 +54,8 @@ class SkinToneDetectionSession: UIViewController {
     var lastInstruction = ""
     var lastImage: CIImage?
     var lastImageSampleBuffer: CMSampleBuffer?
+    let PROCESSING_ALERT = "Processing..."
+    let INTIALIZING_ALERT = "Initializing..."
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,6 +79,23 @@ class SkinToneDetectionSession: UIViewController {
             }
             
         }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        backendServiceQueue.async {
+            guard let backendService = self.backendService else {
+                print ("Backend service not found")
+                return
+            }
+            backendService.createSkinToneSession()
+            
+        }
+        
+        // Display alert.
+        let alert = Utils.createWaitingAlert(message: self.INTIALIZING_ALERT)
+        self.present(alert, animated: true)
     }
     
     func setupLivePreview() {
@@ -142,10 +161,6 @@ class SkinToneDetectionSession: UIViewController {
     
     @IBAction func didTapButton(_ sender: UIButton) {
         backendServiceQueue.async {
-            guard let backendService = self.backendService else {
-                print ("Backend service not found")
-                return
-            }
             guard let faceMaskDetector = self.faceMaskDetector else {
                 print ("Face Mask detector not found")
                 return
@@ -154,7 +169,8 @@ class SkinToneDetectionSession: UIViewController {
 
             switch(self.sessionState) {
             case SessionState.NOT_STARTED:
-                backendService.createSkinToneSession()
+                print ("Error session not started")
+                break
             case SessionState.RUNNING:
                 guard let ciImage = self.lastImage else {
                     print ("Last image not found")
@@ -205,7 +221,7 @@ extension SkinToneDetectionSession: FaceMaskDelegate {
             
             // Display alert.
             DispatchQueue.main.async {
-                let alert = Utils.createWaitingAlert()
+                let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
                 self.present(alert, animated: true)
             }
         }
@@ -222,6 +238,8 @@ extension SkinToneDetectionSession: SessionResponseHandler {
         
         DispatchQueue.main.async {
             self.sessionLabel.text = "Session Running"
+            // Dismiss initialization alert.
+            self.dismiss(animated: false, completion: nil)
         }
     }
     
@@ -231,7 +249,7 @@ extension SkinToneDetectionSession: SessionResponseHandler {
             
             DispatchQueue.main.async {
                 self.navigationLabel.text = instruction
-                // Dismiss alert.
+                // Dismiss processing alert.
                 self.dismiss(animated: false, completion: nil)
             }
         }
