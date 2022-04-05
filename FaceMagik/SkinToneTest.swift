@@ -36,6 +36,7 @@ class SkinToneDetectionSession: UIViewController {
     // Outlets to Storyboard.
     @IBOutlet weak var sessionLabel: UILabel!
     @IBOutlet weak var navigationLabel: UILabel!
+    @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet private var previewView: PreviewView!
     
     // Camera variables.
@@ -159,7 +160,8 @@ class SkinToneDetectionSession: UIViewController {
         return true
     }
     
-    @IBAction func didTapButton(_ sender: UIButton) {
+    @IBAction func didClickPicture(_ sender: UIButton) {
+        animateButton()
         backendServiceQueue.async {
             guard let faceMaskDetector = self.faceMaskDetector else {
                 print ("Face Mask detector not found")
@@ -198,6 +200,18 @@ class SkinToneDetectionSession: UIViewController {
         captureSessionQueue.async {
             self.captureSession.stopRunning()
         }
+    }
+    
+    private func animateButton() {
+        UIView.animate(withDuration: 0.1, delay: 0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.5, options: .curveEaseIn,
+            animations: {
+                self.cameraButton.transform = CGAffineTransform(scaleX: 0.92, y: 0.92)
+            },
+            completion: { _ in
+            UIView.animate(withDuration: 0.1, delay: 0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.5, options: .curveEaseIn, animations:  {
+                    self.cameraButton.transform = CGAffineTransform.identity
+            }, completion: nil)
+        })
     }
     
 }

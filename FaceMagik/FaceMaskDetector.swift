@@ -143,12 +143,10 @@ class FaceMaskDetector {
             print ("Expected \(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS) nose bridge contour points, got \(contour.points.count) points")
             return nil
         }
-        print ("nose bridge countour points: \(contour.points)")
         
         let xSum = contour.points.map{$0.x}.reduce(0, +)
         let ySum = contour.points.map{$0.y}.reduce(0, +)
         let midPoint = [Int(xSum/CGFloat(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS)), Int(ySum/CGFloat(TOTAL_NOSE_BRIDGE_CONTOUR_POINTS))]
-        print ("nose mid point: \(midPoint)")
         return midPoint
     }
     

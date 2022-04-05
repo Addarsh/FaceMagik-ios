@@ -203,7 +203,7 @@
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="clipsToBounds" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="didTapButton:" destination="6jB-e1-b8Q" eventType="touchUpInside" id="ptc-DA-cxg"/>
+                                    <action selector="didClickPicture:" destination="6jB-e1-b8Q" eventType="touchUpInside" id="O6I-G4-jAe"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2tH-Ce-pgp">
@@ -236,6 +236,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="kmd-CA-eVe"/>
                     <connections>
+                        <outlet property="cameraButton" destination="CZQ-Xl-NuB" id="7xG-a8-MIU"/>
                         <outlet property="navigationLabel" destination="188-DI-81T" id="P67-69-obA"/>
                         <outlet property="previewView" destination="Yts-GG-FOD" id="RUG-NW-GIt"/>
                         <outlet property="sessionLabel" destination="2tH-Ce-pgp" id="Kqf-G1-H4b"/>
