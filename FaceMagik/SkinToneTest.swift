@@ -202,6 +202,12 @@ extension SkinToneDetectionSession: FaceMaskDelegate {
                 return
             }
             backendService.detectskinTone(sessionId: self.sessionId, uiImage: lastUIImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddePoint)
+            
+            // Display alert.
+            DispatchQueue.main.async {
+                let alert = Utils.createWaitingAlert()
+                self.present(alert, animated: true)
+            }
         }
     }
 }
@@ -225,6 +231,8 @@ extension SkinToneDetectionSession: SessionResponseHandler {
             
             DispatchQueue.main.async {
                 self.navigationLabel.text = instruction
+                // Dismiss alert.
+                self.dismiss(animated: false, completion: nil)
             }
         }
     }
