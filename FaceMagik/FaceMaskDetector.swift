@@ -88,7 +88,38 @@ class FaceMaskDetector {
                 return
             }
             
-            self.faceMaskDelegate?.detectedfaceMask(faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddlePoint)
+            
+            guard let faceTillNoseEndContourPoints = FaceContourUtils.getFaceTillNoseEndContourPoints(faceContours: face.contours) else {
+                print ("Failed to get face till nose end contour points")
+                return
+            }
+            
+            guard let mouthWithoutLipsContourPoints = FaceContourUtils.getMouthWithoutLipsContourPoints(faceContours: face.contours) else {
+                print ("Failed to get mouth without lips contour points")
+                return
+            }
+            guard let mouthWithLipsContourPoints = FaceContourUtils.getMouthWithLipsConoutPoints(faceContours: face.contours) else {
+                print ("Failed to get mouth with lips contour points")
+                return
+            }
+            guard let leftEyeContourPoints = FaceContourUtils.getEyeContourPoints(faceContours: face.contours, faceContourType: FaceContourType.leftEye) else {
+                print ("Failed to get left eye contour points")
+                return
+            }
+            guard let rightEyeContourPoints = FaceContourUtils.getEyeContourPoints(faceContours: face.contours, faceContourType: FaceContourType.rightEye) else {
+                print ("Failed to get right eye contour points")
+                return
+            }
+            guard let leftEyebrowContourPoints = FaceContourUtils.getEyebrowContourPoints(faceContours: face.contours, faceContourTop: FaceContourType.leftEyebrowTop, faceContourBottom: FaceContourType.leftEyebrowBottom) else {
+                print ("Failed to get left eyebrow contour points")
+                return
+            }
+            guard let rightEyebrowContourPoints = FaceContourUtils.getEyebrowContourPoints(faceContours: face.contours, faceContourTop: FaceContourType.rightEyebrowTop, faceContourBottom: FaceContourType.rightEyebrowBottom) else {
+                print ("Failed to get right eyebrow contour points")
+                return
+            }
+            
+            self.faceMaskDelegate?.detectedfaceMask(uiImage: uiImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddlePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints:rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
         }
     }
     
@@ -135,7 +166,7 @@ class FaceMaskDetector {
     }
     
     private func noseMiddlePoint(face: Face, uiImage: UIImage) -> [Int]? {
-        guard let contour = validateContourType(faceContours: face.contours, faceContourType: FaceContourType.noseBridge) else {
+        guard let contour = FaceContourUtils.validateContourType(faceContours: face.contours, faceContourType: FaceContourType.noseBridge) else {
             print ("Failed to validate contour type: noseBridge")
             return nil
         }
@@ -189,11 +220,11 @@ class FaceMaskDetector {
     
     // Creates face mask until nose end. It will include eyes and eyebrows.
     private func createFaceMaskTillNoseEnd(faceContours: [FaceContour], uiImage: UIImage) -> CIImage? {
-        guard let contour = validateContourType(faceContours: faceContours, faceContourType: FaceContourType.face) else {
+        guard let contour = FaceContourUtils.validateContourType(faceContours: faceContours, faceContourType: FaceContourType.face) else {
             print ("Failed to validate contour type: face")
             return nil
         }
-        guard let noseBottomContour = validateContourType(faceContours: faceContours, faceContourType: FaceContourType.noseBottom) else {
+        guard let noseBottomContour = FaceContourUtils.validateContourType(faceContours: faceContours, faceContourType: FaceContourType.noseBottom) else {
             print ("Failed to validate contour type: noseBottom")
             return nil
         }
@@ -210,7 +241,7 @@ class FaceMaskDetector {
     
     // Creates a mask of given contour type.
     private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourType: FaceContourType) -> CIImage? {
-        guard let contour = validateContourType(faceContours: faceContours, faceContourType: faceContourType) else {
+        guard let contour = FaceContourUtils.validateContourType(faceContours: faceContours, faceContourType: faceContourType) else {
             print ("Failed to validate contour type: \(faceContourType)")
             return nil
         }
@@ -219,12 +250,12 @@ class FaceMaskDetector {
     
     // Creates a mask combining given two contour types.
     private func createContourMask(faceContours: [FaceContour], uiImage: UIImage, faceContourOne: FaceContourType, faceContourTwo: FaceContourType, reverse: Bool) -> CIImage? {
-        guard let contourOne = validateContourType(faceContours: faceContours, faceContourType: faceContourOne) else {
+        guard let contourOne = FaceContourUtils.validateContourType(faceContours: faceContours, faceContourType: faceContourOne) else {
             print ("Failed to validate contour type: \(faceContourOne)")
             return nil
         }
         
-        guard let contourTwo = validateContourType(faceContours: faceContours, faceContourType: faceContourTwo) else {
+        guard let contourTwo = FaceContourUtils.validateContourType(faceContours: faceContours, faceContourType: faceContourTwo) else {
             print ("Failed to validate contour type: \(faceContourTwo)")
             return nil
         }
@@ -273,16 +304,6 @@ class FaceMaskDetector {
             return firstPoints + secondPoints.reversed()
         }
         return firstPoints + secondPoints
-    }
-    
-    
-    private func validateContourType(faceContours: [FaceContour], faceContourType: FaceContourType) -> FaceContour? {
-        let contours = faceContours.filter({$0.type == faceContourType})
-        if contours.count != 1 {
-            print ("Expected 1 contour for type: \(faceContourType), got \(contours.count) contours")
-            return nil
-        }
-        return contours[0]
     }
     
     // bitwiseXor returns a mask that applies the bitwise XOR operation on given masks.

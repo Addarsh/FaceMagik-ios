@@ -28,6 +28,13 @@ class BackendService {
         // Right Eye Mask is a Base64 encodeded string.
         let right_eye_mask: String
         let nose_middle_point: [Int]
+        let face_till_nose_end_contour_points: [[Int]]
+        let mouth_without_lips_contour_points: [[Int]]
+        let mouth_with_lips_contour_points: [[Int]]
+        let left_eye_contour_points: [[Int]]
+        let right_eye_contour_points: [[Int]]
+        let left_eyebrow_contour_points: [[Int]]
+        let right_eyebrow_contour_points: [[Int]]
     }
     
     struct SkinToneDetectionResponse: Codable {
@@ -49,6 +56,8 @@ class BackendService {
     let HTTP_POST_METHOD = "POST"
     let APPLICATION_JSON = "application/json"
     let CONTENT_TYPE = "Content-Type"
+    
+    var backendRequestStartTime: Date = Date()
     
     
     // Delegate object.
@@ -111,7 +120,7 @@ class BackendService {
         
     }
     
-    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int]) {
+    func detectskinTone(sessionId: String, uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
         let postURL = HTTPS_PREFIX + DOMAIN_PREFIX + DOMAIN + ENDPOINT
         guard let url = URL(string: postURL) else {
             print ("Could not initialize URL string: \(postURL)")
@@ -127,7 +136,7 @@ class BackendService {
         let mouthMaskbase64 = Utils.tobase64String(uiImage: mouthMask)
         let leftEyeMaskbase64 = Utils.tobase64String(uiImage: leftEyeMask)
         let rightEyeMaskbase64 = Utils.tobase64String(uiImage: rightEyeMask)
-        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64, mouth_mask: mouthMaskbase64, left_eye_mask: leftEyeMaskbase64, right_eye_mask: rightEyeMaskbase64, nose_middle_point: noseMiddePoint)
+        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, face_mask: faceMaskbase64, mouth_mask: mouthMaskbase64, left_eye_mask: leftEyeMaskbase64, right_eye_mask: rightEyeMaskbase64, nose_middle_point: noseMiddePoint, face_till_nose_end_contour_points: faceTillNoseEndContourPoints, mouth_without_lips_contour_points: mouthWithoutLipsContourPoints, mouth_with_lips_contour_points: mouthWithLipsContourPoints, left_eye_contour_points: leftEyeContourPoints, right_eye_contour_points: rightEyeContourPoints, left_eyebrow_contour_points: leftEyebrowContourPoints, right_eyebrow_contour_points: rightEyebrowContourPoints)
         
         var jsonBody: Data
         do {
@@ -138,6 +147,7 @@ class BackendService {
         }
         request.httpBody = jsonBody
         
+        backendRequestStartTime = Date()
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 print("Error in sending POST request \(error)")
@@ -162,6 +172,8 @@ class BackendService {
                 print ("Error in JSON deserialization: \(err.localizedDescription)")
                 return
             }
+            
+            print ("Skin tone backend request time: \(Date().timeIntervalSince(self.backendRequestStartTime))")
             
             // Call back delegate.
             self.sessionResponseHandler?.userNavigationInstruction(instruction: skinToneDetectionResponse.navigation_instruction)

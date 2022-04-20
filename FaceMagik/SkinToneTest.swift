@@ -45,6 +45,7 @@ class SkinToneDetectionSession: UIViewController {
     private let notifCenter = NotificationCenter.default
     private let captureSessionQueue = DispatchQueue(label: "user video queue", qos: .userInteractive, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     private let videoOutputQueue = DispatchQueue(label: "output video frames queue")
+    var pictureClickStartTime: Date = Date()
     
     // Skin tone session variables.
     private let backendServiceQueue = DispatchQueue(label: "backend service queue", qos: .default, attributes: [], autoreleaseFrequency: .inherit, target: nil)
@@ -182,6 +183,7 @@ class SkinToneDetectionSession: UIViewController {
                     print ("UIImage resize failed")
                     return
                 }
+                self.pictureClickStartTime = Date()
                 faceMaskDetector.detect(uiImage: uiImage)
             case SessionState.COMPLETE:
                 print ("Session complete")
@@ -217,21 +219,13 @@ class SkinToneDetectionSession: UIViewController {
 }
 
 extension SkinToneDetectionSession: FaceMaskDelegate {
-    func detectedfaceMask(faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int]) {
+    func detectedfaceMask(uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
         backendServiceQueue.async {
             guard let backendService = self.backendService else {
                 print ("Backend service not found")
                 return
             }
-            guard let lastImage = self.lastImage else {
-                print ("Last image not found")
-                return
-            }
-            guard let lastUIImage = UIImage(ciImage: lastImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
-                print ("UIImage resize failed")
-                return
-            }
-            backendService.detectskinTone(sessionId: self.sessionId, uiImage: lastUIImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddePoint)
+            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
             
             // Display alert.
             DispatchQueue.main.async {
@@ -259,6 +253,7 @@ extension SkinToneDetectionSession: SessionResponseHandler {
     
     func userNavigationInstruction(instruction: String) {
         backendServiceQueue.async {
+            print ("End to End latency: \(Date().timeIntervalSince(self.pictureClickStartTime))")
             self.lastInstruction = instruction
             
             DispatchQueue.main.async {
