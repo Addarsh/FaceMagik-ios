@@ -30,6 +30,10 @@ class Utils {
         alert.view.addSubview(loadingIndicator)
         return alert
     }
+    
+    static func toUIImage(ciImage: CIImage, resizedWidth: Int) -> UIImage? {
+       return UIImage(ciImage: ciImage).resized(toWidth: CGFloat(resizedWidth))
+    }
 }
 
 extension UIImage {
