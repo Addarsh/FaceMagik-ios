@@ -10,15 +10,15 @@ import MLKit
 import UIKit
 import CoreImage.CIFilterBuiltins
 
-class FaceMaskDetector {
+class FaceContourDetector {
     
     static let TOTAL_NOSE_BRIDGE_CONTOUR_POINTS = 2
     
     var faceDetector: FaceDetector?
-    var faceMaskDelegate: FaceMaskDelegate?
+    var faceContourDelegate: FaceContourDelegate?
     
-    init(faceMaskDelegate: FaceMaskDelegate?) {
-        self.faceMaskDelegate = faceMaskDelegate
+    init(faceContourDelegate: FaceContourDelegate?) {
+        self.faceContourDelegate = faceContourDelegate
         
         // Configure detector to find contours.
         let options = FaceDetectorOptions()
@@ -48,34 +48,14 @@ class FaceMaskDetector {
             }
             
             let face = faces[0]
-            let resizedWidth = 720
-            guard let faceMask = FaceMaskUtils.createFaceMaskTillNoseEnd(face: face, uiImage: uiImage, resizedWidth: resizedWidth) else {
-                print ("Could not create face mask till nose end Contour mask")
-                return
-            }
-            guard let mouthMask = FaceMaskUtils.createMouthMask(face: face, uiImage: uiImage, resizedWidth: resizedWidth) else {
-                print ("Could not create mouth Contour mask")
-                return
-            }
-            guard let leftEyeMask = FaceMaskUtils.createContourMask(faceContours: face.contours, uiImage: uiImage, faceContourType: FaceContourType.leftEye, resizedWidth: resizedWidth) else {
-                print ("Could not create left eye contour mask")
-                return
-            }
-            guard let rightEyeMask = FaceMaskUtils.createContourMask(faceContours: face.contours, uiImage: uiImage, faceContourType: FaceContourType.rightEye, resizedWidth: resizedWidth) else {
-                print ("Could not create right eye contour mask")
-                return
-            }
-            
-            guard let noseMiddlePoint = FaceMaskDetector.getNoseMiddlePoint(faceContours: face.contours) else {
+            guard let noseMiddlePoint = FaceContourDetector.getNoseMiddlePoint(faceContours: face.contours) else {
                 print ("Could not get nose middle point")
                 return
             }
-            
             guard let faceTillNoseEndContourPoints = FaceContourUtils.getFaceTillNoseEndContourPoints(faceContours: face.contours) else {
                 print ("Failed to get face till nose end contour points")
                 return
             }
-            
             guard let mouthWithoutLipsContourPoints = FaceContourUtils.getMouthWithoutLipsContourPoints(faceContours: face.contours) else {
                 print ("Failed to get mouth without lips contour points")
                 return
@@ -101,7 +81,7 @@ class FaceMaskDetector {
                 return
             }
             
-            self.faceMaskDelegate?.detectedfaceMask(uiImage: uiImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddlePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints:rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
+            self.faceContourDelegate?.detectedContours(uiImage: uiImage, noseMiddePoint: noseMiddlePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints:rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
         }
     }
     

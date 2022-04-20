@@ -51,7 +51,7 @@ class SkinToneDetectionSession: UIViewController {
     private let backendServiceQueue = DispatchQueue(label: "backend service queue", qos: .default, attributes: [], autoreleaseFrequency: .inherit, target: nil)
     var sessionState = SessionState.NOT_STARTED
     var backendService: BackendService?
-    var faceMaskDetector: FaceMaskDetector?
+    var faceContourDetector: FaceContourDetector?
     var sessionId = ""
     var lastInstruction = ""
     var lastImage: CIImage?
@@ -63,7 +63,7 @@ class SkinToneDetectionSession: UIViewController {
         super.viewDidLoad()
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         backendService = BackendService(sessionResponseHandler: self)
-        faceMaskDetector = FaceMaskDetector(faceMaskDelegate: self)
+        faceContourDetector = FaceContourDetector(faceContourDelegate: self)
 
         if !isCameraUseAuthorized() {
             return
@@ -164,7 +164,7 @@ class SkinToneDetectionSession: UIViewController {
     @IBAction func didClickPicture(_ sender: UIButton) {
         animateButton()
         backendServiceQueue.async {
-            guard let faceMaskDetector = self.faceMaskDetector else {
+            guard let faceMaskDetector = self.faceContourDetector else {
                 print ("Face Mask detector not found")
                 return
             }
@@ -179,7 +179,8 @@ class SkinToneDetectionSession: UIViewController {
                     print ("Last image not found")
                     return
                 }
-                guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: 720) else {
+                let resizedWidth = CGFloat(600)
+                guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: resizedWidth) else {
                     print ("UIImage resize failed")
                     return
                 }
@@ -218,14 +219,14 @@ class SkinToneDetectionSession: UIViewController {
     
 }
 
-extension SkinToneDetectionSession: FaceMaskDelegate {
-    func detectedfaceMask(uiImage: UIImage, faceMask: UIImage, mouthMask: UIImage, leftEyeMask: UIImage, rightEyeMask: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
+extension SkinToneDetectionSession: FaceContourDelegate {
+    func detectedContours(uiImage: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
         backendServiceQueue.async {
             guard let backendService = self.backendService else {
                 print ("Backend service not found")
                 return
             }
-            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, faceMask: faceMask, mouthMask: mouthMask, leftEyeMask: leftEyeMask, rightEyeMask: rightEyeMask, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
+            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
             
             // Display alert.
             DispatchQueue.main.async {

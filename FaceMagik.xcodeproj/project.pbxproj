@@ -22,8 +22,8 @@
 		986A651C27ED5DC40002770F /* BackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651B27ED5DC40002770F /* BackendService.swift */; };
 		986A651E27EE776A0002770F /* SessionResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651D27EE77690002770F /* SessionResponseHandler.swift */; };
 		986A652027EF6F850002770F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A651F27EF6F850002770F /* Utils.swift */; };
-		986A652227F052A40002770F /* FaceMaskDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652127F052A40002770F /* FaceMaskDetector.swift */; };
-		986A652427F2D72B0002770F /* FaceMaskDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652327F2D72B0002770F /* FaceMaskDelegate.swift */; };
+		986A652227F052A40002770F /* FaceContourDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652127F052A40002770F /* FaceContourDetector.swift */; };
+		986A652427F2D72B0002770F /* FaceContourDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652327F2D72B0002770F /* FaceContourDelegate.swift */; };
 		986A652627FF40640002770F /* FaceContourUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652527FF40640002770F /* FaceContourUtils.swift */; };
 		986A652A280FC61E0002770F /* FaceMaskUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A6529280FC61E0002770F /* FaceMaskUtils.swift */; };
 		994D42197966AF4D3F6C9384 /* Pods_FaceMagik_FaceMagikUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D840143DB80361451B66E32B /* Pods_FaceMagik_FaceMagikUITests.framework */; };
@@ -71,8 +71,8 @@
 		986A651B27ED5DC40002770F /* BackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendService.swift; sourceTree = "<group>"; };
 		986A651D27EE77690002770F /* SessionResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionResponseHandler.swift; sourceTree = "<group>"; };
 		986A651F27EF6F850002770F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		986A652127F052A40002770F /* FaceMaskDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMaskDetector.swift; sourceTree = "<group>"; };
-		986A652327F2D72B0002770F /* FaceMaskDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMaskDelegate.swift; sourceTree = "<group>"; };
+		986A652127F052A40002770F /* FaceContourDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourDetector.swift; sourceTree = "<group>"; };
+		986A652327F2D72B0002770F /* FaceContourDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourDelegate.swift; sourceTree = "<group>"; };
 		986A652527FF40640002770F /* FaceContourUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourUtils.swift; sourceTree = "<group>"; };
 		986A6529280FC61E0002770F /* FaceMaskUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMaskUtils.swift; sourceTree = "<group>"; };
 		BC5CD5A31F30FA87E12FA1CA /* Pods-FaceMagikTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagikTests.release.xcconfig"; path = "Target Support Files/Pods-FaceMagikTests/Pods-FaceMagikTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -154,8 +154,8 @@
 				986A651D27EE77690002770F /* SessionResponseHandler.swift */,
 				986A652527FF40640002770F /* FaceContourUtils.swift */,
 				986A6529280FC61E0002770F /* FaceMaskUtils.swift */,
-				986A652127F052A40002770F /* FaceMaskDetector.swift */,
-				986A652327F2D72B0002770F /* FaceMaskDelegate.swift */,
+				986A652127F052A40002770F /* FaceContourDetector.swift */,
+				986A652327F2D72B0002770F /* FaceContourDelegate.swift */,
 				986A651F27EF6F850002770F /* Utils.swift */,
 				986A64EC27E7C4870002770F /* Assets.xcassets */,
 				986A64EE27E7C4870002770F /* LaunchScreen.storyboard */,
@@ -470,7 +470,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				986A652427F2D72B0002770F /* FaceMaskDelegate.swift in Sources */,
+				986A652427F2D72B0002770F /* FaceContourDelegate.swift in Sources */,
 				986A651A27E7F25B0002770F /* SkinToneTest.swift in Sources */,
 				986A64E827E7C4850002770F /* ViewController.swift in Sources */,
 				986A651E27EE776A0002770F /* SessionResponseHandler.swift in Sources */,
@@ -480,7 +480,7 @@
 				986A64E627E7C4850002770F /* SceneDelegate.swift in Sources */,
 				986A652A280FC61E0002770F /* FaceMaskUtils.swift in Sources */,
 				986A651C27ED5DC40002770F /* BackendService.swift in Sources */,
-				986A652227F052A40002770F /* FaceMaskDetector.swift in Sources */,
+				986A652227F052A40002770F /* FaceContourDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
