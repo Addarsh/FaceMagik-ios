@@ -35,10 +35,18 @@ class BackendService {
         let navigation_instruction: String
     }
     
-    let TEST_USER_ID = "86d74345-b0f0-46ab-b8bd-b94c72362079"
+    // Local instance constants.
+    /*let TEST_USER_ID = "86d74345-b0f0-46ab-b8bd-b94c72362079"
     let HTTPS_PREFIX = "https://"
     let DOMAIN_PREFIX = "1365-73-202-97-212"
-    let DOMAIN = ".ngrok.io"
+    let DOMAIN = ".ngrok.io"*/
+    
+    // AWS instance constants.
+    let TEST_USER_ID = "9586a2ce-60d0-488f-817a-43260e40236a"
+    let HTTPS_PREFIX = "http://"
+    let DOMAIN_PREFIX = "facemagik-test.eba-24rwkh9x"
+    let DOMAIN = ".us-west-2.elasticbeanstalk.com"
+    
     let ENDPOINT = "/foundation/session/"
     let USER_QUERY_PARAM = "?user_id="
     
@@ -119,11 +127,15 @@ class BackendService {
             return
         }
         
+        // Resizing image further so server can process the image faster.
+        let resizedWidth = CGFloat(400)
+        let newuiImage = uiImage.resized(toWidth: resizedWidth)!
+        
         var request = URLRequest(url: url)
         request.httpMethod = HTTP_POST_METHOD
         request.setValue(APPLICATION_JSON, forHTTPHeaderField: CONTENT_TYPE)
         
-        let base64Image = Utils.tobase64String(uiImage: uiImage)
+        let base64Image = Utils.tobase64String(uiImage: newuiImage)
         let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, nose_middle_point: noseMiddePoint, face_till_nose_end_contour_points: faceTillNoseEndContourPoints, mouth_without_lips_contour_points: mouthWithoutLipsContourPoints, mouth_with_lips_contour_points: mouthWithLipsContourPoints, left_eye_contour_points: leftEyeContourPoints, right_eye_contour_points: rightEyeContourPoints, left_eyebrow_contour_points: leftEyebrowContourPoints, right_eyebrow_contour_points: rightEyebrowContourPoints)
         
         var jsonBody: Data
