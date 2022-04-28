@@ -26,6 +26,8 @@
 		986A652427F2D72B0002770F /* FaceContourDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652327F2D72B0002770F /* FaceContourDelegate.swift */; };
 		986A652627FF40640002770F /* FaceContourUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A652527FF40640002770F /* FaceContourUtils.swift */; };
 		986A652A280FC61E0002770F /* FaceMaskUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986A6529280FC61E0002770F /* FaceMaskUtils.swift */; };
+		98D8B2CB281B238700592E78 /* UserSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2CA281B238700592E78 /* UserSessionService.swift */; };
+		98D8B2CD281B3E5100592E78 /* UserSessionServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */; };
 		994D42197966AF4D3F6C9384 /* Pods_FaceMagik_FaceMagikUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D840143DB80361451B66E32B /* Pods_FaceMagik_FaceMagikUITests.framework */; };
 		A6EE91A8E0CE4421C8DCD558 /* Pods_FaceMagik.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E3D0250BF99176CD9452B /* Pods_FaceMagik.framework */; };
 /* End PBXBuildFile section */
@@ -75,6 +77,8 @@
 		986A652327F2D72B0002770F /* FaceContourDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourDelegate.swift; sourceTree = "<group>"; };
 		986A652527FF40640002770F /* FaceContourUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourUtils.swift; sourceTree = "<group>"; };
 		986A6529280FC61E0002770F /* FaceMaskUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMaskUtils.swift; sourceTree = "<group>"; };
+		98D8B2CA281B238700592E78 /* UserSessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSessionService.swift; sourceTree = "<group>"; };
+		98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSessionServiceDelegate.swift; sourceTree = "<group>"; };
 		BC5CD5A31F30FA87E12FA1CA /* Pods-FaceMagikTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagikTests.release.xcconfig"; path = "Target Support Files/Pods-FaceMagikTests/Pods-FaceMagikTests.release.xcconfig"; sourceTree = "<group>"; };
 		C711CE50A3DC8FEFB9E50400 /* Pods-FaceMagik-FaceMagikUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagik-FaceMagikUITests.debug.xcconfig"; path = "Target Support Files/Pods-FaceMagik-FaceMagikUITests/Pods-FaceMagik-FaceMagikUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		D7F6706275003A5B3CBEF573 /* Pods-FaceMagik.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagik.debug.xcconfig"; path = "Target Support Files/Pods-FaceMagik/Pods-FaceMagik.debug.xcconfig"; sourceTree = "<group>"; };
@@ -150,6 +154,8 @@
 				986A64E927E7C4850002770F /* Main.storyboard */,
 				986A651727E7F2360002770F /* SkinToneTest.storyboard */,
 				986A651927E7F25B0002770F /* SkinToneTest.swift */,
+				98D8B2CA281B238700592E78 /* UserSessionService.swift */,
+				98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */,
 				986A651B27ED5DC40002770F /* BackendService.swift */,
 				986A651D27EE77690002770F /* SessionResponseHandler.swift */,
 				986A652527FF40640002770F /* FaceContourUtils.swift */,
@@ -479,8 +485,10 @@
 				986A64E427E7C4850002770F /* AppDelegate.swift in Sources */,
 				986A64E627E7C4850002770F /* SceneDelegate.swift in Sources */,
 				986A652A280FC61E0002770F /* FaceMaskUtils.swift in Sources */,
+				98D8B2CD281B3E5100592E78 /* UserSessionServiceDelegate.swift in Sources */,
 				986A651C27ED5DC40002770F /* BackendService.swift in Sources */,
 				986A652227F052A40002770F /* FaceContourDetector.swift in Sources */,
+				98D8B2CB281B238700592E78 /* UserSessionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

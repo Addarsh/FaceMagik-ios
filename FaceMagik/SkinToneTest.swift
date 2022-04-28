@@ -31,7 +31,15 @@ class SkinToneDetectionSession: UIViewController {
         case NOT_STARTED
         case RUNNING
         case COMPLETE
+        case USER_SESSION_CREATED
     }
+    
+    // Class level constant to control which flow is triggered.
+    enum CurrentFlow {
+        case NAVIGATION_PER_UPLOAD
+        case ROTATION_AND_WALKING
+    }
+    private let currentFlow = CurrentFlow.ROTATION_AND_WALKING
     
     // Outlets to Storyboard.
     @IBOutlet weak var sessionLabel: UILabel!
@@ -59,10 +67,15 @@ class SkinToneDetectionSession: UIViewController {
     let PROCESSING_ALERT = "Processing..."
     let INTIALIZING_ALERT = "Initializing..."
     
+    // User Session Service variables.
+    var userSessionService: UserSessionService?
+    var userSessionId = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         backendService = BackendService(sessionResponseHandler: self)
+        userSessionService = UserSessionService(userSessionServiceDelegate: self, is_remote_endpoint: false)
         faceContourDetector = FaceContourDetector(faceContourDelegate: self)
 
         if !isCameraUseAuthorized() {
@@ -87,12 +100,19 @@ class SkinToneDetectionSession: UIViewController {
         super.viewDidAppear(animated)
         
         backendServiceQueue.async {
-            guard let backendService = self.backendService else {
-                print ("Backend service not found")
-                return
+            if (self.currentFlow == CurrentFlow.NAVIGATION_PER_UPLOAD) {
+                guard let backendService = self.backendService else {
+                    print ("Backend service not found")
+                    return
+                }
+                backendService.createSkinToneSession()
+            } else {
+                guard let userSessionService = self.userSessionService else {
+                    print ("UserSession service not found")
+                    return
+                }
+                userSessionService.createUserSession()
             }
-            backendService.createSkinToneSession()
-            
         }
         
         // Display alert.
@@ -161,7 +181,14 @@ class SkinToneDetectionSession: UIViewController {
         return true
     }
     
+    // Handler for trigerring flow that allows user to capture and send pictures to the server for processing. The result from the
+    // server is a navigation instruction for the direction the user must rotate to face the primary direction of light in the scene.
+    // To test another flow in the same class, this handler's fucntionality will be controlled by a class level variable. When disabled,
+    // this handler will return a no-op, otherwise the flow mentioned above will execute.
     @IBAction func didClickPicture(_ sender: UIButton) {
+        if(currentFlow == CurrentFlow.ROTATION_AND_WALKING) {
+            return
+        }
         animateButton()
         backendServiceQueue.async {
             guard let faceMaskDetector = self.faceContourDetector else {
@@ -188,6 +215,8 @@ class SkinToneDetectionSession: UIViewController {
                 faceMaskDetector.detect(uiImage: uiImage)
             case SessionState.COMPLETE:
                 print ("Session complete")
+            default:
+                print ("Session state: \(self.sessionState) is not supported in Backend Service")
             }
         }
     }
@@ -219,22 +248,21 @@ class SkinToneDetectionSession: UIViewController {
     
 }
 
-extension SkinToneDetectionSession: FaceContourDelegate {
-    func detectedContours(uiImage: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
+extension SkinToneDetectionSession: UserSessionServiceDelegate {
+    
+    func onSessionCreation(userSessionId: String) {
         backendServiceQueue.async {
-            guard let backendService = self.backendService else {
-                print ("Backend service not found")
-                return
-            }
-            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
-            
-            // Display alert.
-            DispatchQueue.main.async {
-                let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
-                self.present(alert, animated: true)
-            }
+            self.userSessionId = userSessionId
+            self.sessionState = SessionState.USER_SESSION_CREATED
+        }
+        
+        DispatchQueue.main.async {
+            self.sessionLabel.text = "Session Started"
+            // Dismiss initialization alert.
+            self.dismiss(animated: false, completion: nil)
         }
     }
+    
 }
 
 extension SkinToneDetectionSession: SessionResponseHandler {
@@ -261,6 +289,25 @@ extension SkinToneDetectionSession: SessionResponseHandler {
                 self.navigationLabel.text = instruction
                 // Dismiss processing alert.
                 self.dismiss(animated: false, completion: nil)
+            }
+        }
+    }
+}
+
+// Delegate to detection of face contours.
+extension SkinToneDetectionSession: FaceContourDelegate {
+    func detectedContours(uiImage: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
+        backendServiceQueue.async {
+            guard let backendService = self.backendService else {
+                print ("Backend service not found")
+                return
+            }
+            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
+            
+            // Display alert.
+            DispatchQueue.main.async {
+                let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
+                self.present(alert, animated: true)
             }
         }
     }
