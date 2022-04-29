@@ -24,7 +24,6 @@ class SkinToneTest: UIViewController {
 
 }
 
-
 class SkinToneDetectionSession: UIViewController {
     
     enum SessionState {
@@ -32,6 +31,7 @@ class SkinToneDetectionSession: UIViewController {
         case RUNNING
         case COMPLETE
         case USER_SESSION_CREATED
+        case ROTATION_STARTED
     }
     
     // Class level constant to control which flow is triggered.
@@ -43,6 +43,7 @@ class SkinToneDetectionSession: UIViewController {
     
     // Outlets to Storyboard.
     @IBOutlet weak var sessionLabel: UILabel!
+    @IBOutlet weak var headingLabel: UILabel!
     @IBOutlet weak var navigationLabel: UILabel!
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet private var previewView: PreviewView!
@@ -63,19 +64,23 @@ class SkinToneDetectionSession: UIViewController {
     var sessionId = ""
     var lastInstruction = ""
     var lastImage: CIImage?
-    var lastImageSampleBuffer: CMSampleBuffer?
     let PROCESSING_ALERT = "Processing..."
     let INTIALIZING_ALERT = "Initializing..."
     
     // User Session Service variables.
     var userSessionService: UserSessionService?
     var userSessionId = ""
+    var rotationManager: RotationManager?
+    var headingSet: Set<Int> = []
+    var imagesUploadedInRotation = 0
+    private let rotationManagerQueue = DispatchQueue(label: "rotation manager queue")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         backendService = BackendService(sessionResponseHandler: self)
         userSessionService = UserSessionService(userSessionServiceDelegate: self, is_remote_endpoint: false)
+        rotationManager = RotationManager(rotationManagerDelegate: self)
         faceContourDetector = FaceContourDetector(faceContourDelegate: self)
 
         if !isCameraUseAuthorized() {
@@ -191,7 +196,7 @@ class SkinToneDetectionSession: UIViewController {
         }
         animateButton()
         backendServiceQueue.async {
-            guard let faceMaskDetector = self.faceContourDetector else {
+            guard let faceContourDetector = self.faceContourDetector else {
                 print ("Face Mask detector not found")
                 return
             }
@@ -212,7 +217,7 @@ class SkinToneDetectionSession: UIViewController {
                     return
                 }
                 self.pictureClickStartTime = Date()
-                faceMaskDetector.detect(uiImage: uiImage)
+                faceContourDetector.detect(uiImage: uiImage)
             case SessionState.COMPLETE:
                 print ("Session complete")
             default:
@@ -228,9 +233,13 @@ class SkinToneDetectionSession: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    // When the view disappears.
     override func viewDidDisappear(_ animated: Bool) {
         captureSessionQueue.async {
             self.captureSession.stopRunning()
+        }
+        rotationManagerQueue.async {
+            self.rotationManager?.stopRotationUpdates()
         }
     }
     
@@ -248,6 +257,7 @@ class SkinToneDetectionSession: UIViewController {
     
 }
 
+// Responses from backend UserSessionService.
 extension SkinToneDetectionSession: UserSessionServiceDelegate {
     
     func onSessionCreation(userSessionId: String) {
@@ -261,10 +271,96 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
             // Dismiss initialization alert.
             self.dismiss(animated: false, completion: nil)
         }
+        
+        self.rotationManagerQueue.async {
+            self.rotationManager?.startRotationUpdates()
+        }
     }
-    
 }
 
+// Updates from rotation manager in rotation mode.
+extension SkinToneDetectionSession: RotationManagerDelegate {
+    
+    func updatedHeading(heading: Int) {
+        backendServiceQueue.async {
+            if(self.sessionState != SessionState.ROTATION_STARTED) {
+                self.sessionState = SessionState.ROTATION_STARTED
+            }
+            if(self.headingSet.contains(heading)) {
+                // Image uploaded given heading already.
+                return
+            }
+            if(self.imagesUploadedInRotation == 1) {
+                // Already uploaded max number of images to server.
+                return
+            }
+            
+            self.detectFace(heading: heading)
+            
+            self.imagesUploadedInRotation += 1
+            self.headingSet.insert(heading)
+            
+        }
+        DispatchQueue.main.async {
+            self.headingLabel.text = String(heading)
+        }
+    }
+    
+    
+    func detectFace(heading: Int) {
+        guard let faceContourDetector = self.faceContourDetector else {
+            print ("Face contour detector is nil")
+            return
+        }
+        guard let ciImage = self.lastImage else {
+            print ("Last image not found")
+            return
+        }
+        guard let uiImage = UIImage(ciImage: ciImage, scale: 1.0, orientation: UIImage.Orientation.right).resized(toWidth: CGFloat(600)) else {
+            print ("UIImage resize failed")
+            return
+        }
+        faceContourDetector.detect(uiImage: uiImage, heading: heading)
+    }
+}
+
+
+// Updates for detected contours of given image.
+extension SkinToneDetectionSession: FaceContourDelegate {
+    func detectedContours(uiImage: UIImage, contourPoints: ContourPoints, heading: Int) {
+        backendServiceQueue.async {
+            if (self.currentFlow == CurrentFlow.NAVIGATION_PER_UPLOAD) {
+                self.navigationPerUploadFlow(uiImage: uiImage, contourPoints: contourPoints)
+            } else {
+                self.rotationAndWalkingFlow(uiImage: uiImage, contourPoints: contourPoints, heading: heading)
+            }
+        }
+    }
+    
+    func navigationPerUploadFlow(uiImage: UIImage, contourPoints: ContourPoints) {
+        guard let backendService = self.backendService else {
+            print ("Backend service not found")
+            return
+        }
+        backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, contourPoints: contourPoints)
+        
+        // Display alert.
+        DispatchQueue.main.async {
+            let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
+            self.present(alert, animated: true)
+        }
+    }
+    
+    func rotationAndWalkingFlow(uiImage: UIImage, contourPoints: ContourPoints, heading: Int) {
+        guard let userSessionService = self.userSessionService else {
+            print ("UserSession service not found")
+            return
+        }
+        userSessionService.uploadRotationImage(userSessionId: self.userSessionId, uiImage: uiImage, contourPoints: contourPoints, heading: heading)
+    }
+}
+
+// Responses from backend service.
 extension SkinToneDetectionSession: SessionResponseHandler {
     func onSessionCreation(sessionId: String) {
         
@@ -294,25 +390,7 @@ extension SkinToneDetectionSession: SessionResponseHandler {
     }
 }
 
-// Delegate to detection of face contours.
-extension SkinToneDetectionSession: FaceContourDelegate {
-    func detectedContours(uiImage: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
-        backendServiceQueue.async {
-            guard let backendService = self.backendService else {
-                print ("Backend service not found")
-                return
-            }
-            backendService.detectskinTone(sessionId: self.sessionId, uiImage: uiImage, noseMiddePoint: noseMiddePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
-            
-            // Display alert.
-            DispatchQueue.main.async {
-                let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
-                self.present(alert, animated: true)
-            }
-        }
-    }
-}
-
+// Video frame handler.
 extension SkinToneDetectionSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let cvImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
@@ -322,7 +400,6 @@ extension SkinToneDetectionSession: AVCaptureVideoDataOutputSampleBufferDelegate
         
         let ciImage = CIImage(cvImageBuffer: cvImageBuffer)
         backendServiceQueue.async {
-            self.lastImageSampleBuffer = sampleBuffer
             self.lastImage = ciImage
         }
     }

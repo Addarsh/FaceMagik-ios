@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="GZ8-VP-Mcn">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="GZ8-VP-Mcn">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -206,6 +206,12 @@
                                     <action selector="didClickPicture:" destination="6jB-e1-b8Q" eventType="touchUpInside" id="O6I-G4-jAe"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6lJ-FQ-cow">
+                                <rect key="frame" x="404" y="158" width="0.0" height="0.0"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <color key="textColor" systemColor="systemBlueColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2tH-Ce-pgp">
                                 <rect key="frame" x="404" y="158" width="0.0" height="0.0"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
@@ -229,6 +235,8 @@
                             <constraint firstItem="CZQ-Xl-NuB" firstAttribute="top" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="20" id="FDd-vW-lRc"/>
                             <constraint firstItem="188-DI-81T" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" constant="10" id="HXD-My-t29"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="2tH-Ce-pgp" secondAttribute="trailing" constant="10" id="Jgz-r9-fco"/>
+                            <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="6lJ-FQ-cow" secondAttribute="trailing" constant="10" id="NwJ-o7-bWV"/>
+                            <constraint firstItem="2tH-Ce-pgp" firstAttribute="top" secondItem="6lJ-FQ-cow" secondAttribute="bottom" id="Ovn-YN-Tc5"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="Yts-GG-FOD" secondAttribute="trailing" id="hCc-Mi-oEr"/>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" id="wdw-WA-OIh"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="bottom" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="100" id="xjy-tm-5tp"/>
@@ -237,6 +245,7 @@
                     <navigationItem key="navigationItem" id="kmd-CA-eVe"/>
                     <connections>
                         <outlet property="cameraButton" destination="CZQ-Xl-NuB" id="7xG-a8-MIU"/>
+                        <outlet property="headingLabel" destination="6lJ-FQ-cow" id="4Tf-Jw-4kI"/>
                         <outlet property="navigationLabel" destination="188-DI-81T" id="P67-69-obA"/>
                         <outlet property="previewView" destination="Yts-GG-FOD" id="RUG-NW-GIt"/>
                         <outlet property="sessionLabel" destination="2tH-Ce-pgp" id="Kqf-G1-H4b"/>
@@ -251,6 +260,9 @@
         <image name="phone" width="358.5" height="360"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
             <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

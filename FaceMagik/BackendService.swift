@@ -120,7 +120,7 @@ class BackendService {
         
     }
     
-    func detectskinTone(sessionId: String, uiImage: UIImage, noseMiddePoint: [Int], faceTillNoseEndContourPoints: [[Int]], mouthWithoutLipsContourPoints: [[Int]], mouthWithLipsContourPoints: [[Int]], leftEyeContourPoints: [[Int]], rightEyeContourPoints: [[Int]], leftEyebrowContourPoints: [[Int]], rightEyebrowContourPoints: [[Int]]) {
+    func detectskinTone(sessionId: String, uiImage: UIImage, contourPoints: ContourPoints) {
         let postURL = HTTPS_PREFIX + DOMAIN_PREFIX + DOMAIN + ENDPOINT
         guard let url = URL(string: postURL) else {
             print ("Could not initialize URL string: \(postURL)")
@@ -136,7 +136,7 @@ class BackendService {
         request.setValue(APPLICATION_JSON, forHTTPHeaderField: CONTENT_TYPE)
         
         let base64Image = Utils.tobase64String(uiImage: newuiImage)
-        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, nose_middle_point: noseMiddePoint, face_till_nose_end_contour_points: faceTillNoseEndContourPoints, mouth_without_lips_contour_points: mouthWithoutLipsContourPoints, mouth_with_lips_contour_points: mouthWithLipsContourPoints, left_eye_contour_points: leftEyeContourPoints, right_eye_contour_points: rightEyeContourPoints, left_eyebrow_contour_points: leftEyebrowContourPoints, right_eyebrow_contour_points: rightEyebrowContourPoints)
+        let skinToneDetectionRequest = SkinToneDetectionRequest(session_id: sessionId, image_name: "test_ios.png", image: base64Image, nose_middle_point: contourPoints.noseMiddePoint, face_till_nose_end_contour_points: contourPoints.faceTillNoseEndContourPoints, mouth_without_lips_contour_points: contourPoints.mouthWithoutLipsContourPoints, mouth_with_lips_contour_points:contourPoints.mouthWithLipsContourPoints, left_eye_contour_points: contourPoints.leftEyeContourPoints, right_eye_contour_points: contourPoints.rightEyeContourPoints, left_eyebrow_contour_points: contourPoints.leftEyebrowContourPoints, right_eyebrow_contour_points: contourPoints.rightEyebrowContourPoints)
         
         var jsonBody: Data
         do {

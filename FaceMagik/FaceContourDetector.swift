@@ -27,7 +27,7 @@ class FaceContourDetector {
         faceDetector = FaceDetector.faceDetector(options: options)
     }
     
-    public func detect(uiImage: UIImage) {
+    public func detect(uiImage: UIImage, heading: Int = 0) {
         guard let faceDetector = faceDetector else {
             print ("face detector is not initialized")
             return
@@ -81,7 +81,8 @@ class FaceContourDetector {
                 return
             }
             
-            self.faceContourDelegate?.detectedContours(uiImage: uiImage, noseMiddePoint: noseMiddlePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints:rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
+            let contourPoints = ContourPoints(noseMiddePoint: noseMiddlePoint, faceTillNoseEndContourPoints: faceTillNoseEndContourPoints, mouthWithoutLipsContourPoints: mouthWithoutLipsContourPoints, mouthWithLipsContourPoints: mouthWithLipsContourPoints, leftEyeContourPoints: leftEyeContourPoints, rightEyeContourPoints: rightEyeContourPoints, leftEyebrowContourPoints: leftEyebrowContourPoints, rightEyebrowContourPoints: rightEyebrowContourPoints)
+            self.faceContourDelegate?.detectedContours(uiImage: uiImage, contourPoints: contourPoints, heading: heading)
         }
     }
     

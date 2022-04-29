@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 class UserSessionService {
@@ -18,13 +19,29 @@ class UserSessionService {
         let user_session_id: String
     }
     
+    struct UploadRotationImageRequest: Codable {
+        let user_session_id: String
+        // Image is a Base64 encoded string.
+        let image: String
+        let nose_middle_point: [Int]
+        let face_till_nose_end_contour_points: [[Int]]
+        let mouth_without_lips_contour_points: [[Int]]
+        let mouth_with_lips_contour_points: [[Int]]
+        let left_eye_contour_points: [[Int]]
+        let right_eye_contour_points: [[Int]]
+        let left_eyebrow_contour_points: [[Int]]
+        let right_eyebrow_contour_points: [[Int]]
+        let heading: Int
+    }
+    
     private let remoteEndPoint = "http://facemagik-test.eba-24rwkh9x.us-west-2.elasticbeanstalk.com"
     private let localEndpoint = "https://334c-71-202-19-95.ngrok.io"
     
     private let localTestUserId = "86d74345-b0f0-46ab-b8bd-b94c72362079"
     private let remoteTestUserId = "9586a2ce-60d0-488f-817a-43260e40236a"
     
-    private var is_remote_endpoint: Bool
+    private var endpoint: String
+    private var testUserId: String
     
     // Header constants.
     let HTTP_GETD = "GET"
@@ -38,17 +55,16 @@ class UserSessionService {
     
     init(userSessionServiceDelegate: UserSessionServiceDelegate?, is_remote_endpoint: Bool) {
         self.userSessionServiceDelegate = userSessionServiceDelegate
-        self.is_remote_endpoint = is_remote_endpoint
+        self.endpoint = is_remote_endpoint ? remoteEndPoint: localEndpoint
+        self.testUserId = is_remote_endpoint ? remoteTestUserId : localTestUserId
     }
     
     func createUserSession() {
-        let endpoint = is_remote_endpoint ? remoteEndPoint : localEndpoint
         let urlStr = endpoint + "/foundation/user_session/"
         guard let url = URL(string: urlStr) else {
             print ("Could not initialize URL string: \(urlStr)")
             return
         }
-        
         var request = URLRequest(url: url)
         request.httpMethod = HTTP_POST
         request.setValue(APPLICATION_JSON, forHTTPHeaderField: CONTENT_TYPE)
@@ -56,7 +72,7 @@ class UserSessionService {
         // Attach POST body.
         var jsonBody: Data
         do {
-            jsonBody = try JSONEncoder().encode(UserSessionCreationRequest(user_id: is_remote_endpoint ? remoteTestUserId : localTestUserId))
+            jsonBody = try JSONEncoder().encode(UserSessionCreationRequest(user_id: testUserId))
         } catch let err {
             print ("Error in JSON encoding: \(err.localizedDescription)")
             return
@@ -79,6 +95,31 @@ class UserSessionService {
         
         // Call back delegate.
         userSessionServiceDelegate?.onSessionCreation(userSessionId: userSessioCreationResponse.user_session_id)
+    }
+    
+    func uploadRotationImage(userSessionId: String, uiImage: UIImage, contourPoints: ContourPoints, heading: Int) {
+        let urlStr = endpoint + "/foundation/user_session/rotation_image/"
+        guard let url = URL(string: urlStr) else {
+            print ("Could not initialize URL string: \(urlStr)")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTP_POST
+        request.setValue(APPLICATION_JSON, forHTTPHeaderField: CONTENT_TYPE)
+        
+        // Attach POST body.
+        var jsonBody: Data
+        let base64Image = Utils.tobase64String(uiImage: uiImage)
+        let uploadRotationImageRequest = UploadRotationImageRequest(user_session_id: userSessionId, image: base64Image, nose_middle_point: contourPoints.noseMiddePoint, face_till_nose_end_contour_points: contourPoints.faceTillNoseEndContourPoints, mouth_without_lips_contour_points: contourPoints.mouthWithoutLipsContourPoints, mouth_with_lips_contour_points: contourPoints.mouthWithLipsContourPoints, left_eye_contour_points: contourPoints.leftEyeContourPoints, right_eye_contour_points: contourPoints.rightEyeContourPoints, left_eyebrow_contour_points: contourPoints.leftEyebrowContourPoints, right_eyebrow_contour_points: contourPoints.rightEyebrowContourPoints, heading: heading)
+        do {
+            jsonBody = try JSONEncoder().encode(uploadRotationImageRequest)
+        } catch let err {
+            print ("Error in JSON encoding: \(err.localizedDescription)")
+            return
+        }
+        request.httpBody = jsonBody
+        
+        makeRequest(request: request, onSuccess: {_ in})
     }
     
     
