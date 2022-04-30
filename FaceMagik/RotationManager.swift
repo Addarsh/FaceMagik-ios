@@ -45,6 +45,16 @@ class RotationManager {
         }
         self.motionManager.stopDeviceMotionUpdates()
     }
+    
+    // returns smallest the difference (a-b) in degrees between two angles that are close to each other taking into account roll over from 360 to 0.
+    // Can return both positive and negative values.
+    static func smallestDegreeDiff(_ a: Int, _ b: Int) -> Int {
+        if abs(a-b) > 360 - abs(a-b) {
+            // Roll over.
+            return a-b >= 0 ? abs(a-b) - 360 : 360 - abs(a-b)
+        }
+        return a - b
+    }
 }
 
 

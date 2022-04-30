@@ -35,7 +35,7 @@ class UserSessionService {
     }
     
     private let remoteEndPoint = "http://facemagik-test.eba-24rwkh9x.us-west-2.elasticbeanstalk.com"
-    private let localEndpoint = "https://334c-71-202-19-95.ngrok.io"
+    private let localEndpoint = "https://1f74-71-202-19-95.ngrok.io"
     
     private let localTestUserId = "86d74345-b0f0-46ab-b8bd-b94c72362079"
     private let remoteTestUserId = "9586a2ce-60d0-488f-817a-43260e40236a"
@@ -80,7 +80,7 @@ class UserSessionService {
         request.httpBody = jsonBody
         
         
-        makeRequest(request: request, onSuccess: onUserSessionCreation)
+        makeRequest(request: request, onSuccess: onUserSessionCreation, onReturn: {})
     }
     
     // Handle successful user session creation.
@@ -97,11 +97,11 @@ class UserSessionService {
         userSessionServiceDelegate?.onSessionCreation(userSessionId: userSessioCreationResponse.user_session_id)
     }
     
-    func uploadRotationImage(userSessionId: String, uiImage: UIImage, contourPoints: ContourPoints, heading: Int) {
+    func uploadRotationImage(userSessionId: String, uiImage: UIImage, contourPoints: ContourPoints, heading: Int) -> Bool {
         let urlStr = endpoint + "/foundation/user_session/rotation_image/"
         guard let url = URL(string: urlStr) else {
             print ("Could not initialize URL string: \(urlStr)")
-            return
+            return false
         }
         var request = URLRequest(url: url)
         request.httpMethod = HTTP_POST
@@ -115,19 +115,22 @@ class UserSessionService {
             jsonBody = try JSONEncoder().encode(uploadRotationImageRequest)
         } catch let err {
             print ("Error in JSON encoding: \(err.localizedDescription)")
-            return
+            return false
         }
         request.httpBody = jsonBody
         
-        makeRequest(request: request, onSuccess: {_ in})
+        makeRequest(request: request, onSuccess: {_ in}, onReturn: {self.userSessionServiceDelegate?.uploadRotationImageResponseReceived()})
+        return true
     }
     
     
     // Shared method to make given request call to the backend. A successful response is handled by the onSuccess callback provided.
-    private func makeRequest(request: URLRequest, onSuccess: @escaping (Data) -> Void) {
+    private func makeRequest(request: URLRequest, onSuccess: @escaping (Data) -> Void, onReturn: @escaping () -> Void) {
         let requestStartTime = Date()
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             print ("Backend Request took : \(Date().timeIntervalSince(requestStartTime)) seconds to complete")
+            onReturn()
+            
             if let error = error {
                 print("Error in sending POST request \(error)")
                 return

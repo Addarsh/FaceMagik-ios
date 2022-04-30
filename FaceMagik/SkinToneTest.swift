@@ -44,6 +44,7 @@ class SkinToneDetectionSession: UIViewController {
     // Outlets to Storyboard.
     @IBOutlet weak var sessionLabel: UILabel!
     @IBOutlet weak var headingLabel: UILabel!
+    @IBOutlet weak var instructionLabel: UILabel!
     @IBOutlet weak var navigationLabel: UILabel!
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet private var previewView: PreviewView!
@@ -72,7 +73,9 @@ class SkinToneDetectionSession: UIViewController {
     var userSessionId = ""
     var rotationManager: RotationManager?
     var headingSet: Set<Int> = []
-    var imagesUploadedInRotation = 0
+    var numRotationImagesSent = 0
+    var numRotationImagesReceived = 0
+    var lastHeadingValue: Int = -1
     private let rotationManagerQueue = DispatchQueue(label: "rotation manager queue")
     
     override func viewDidLoad() {
@@ -276,6 +279,18 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
             self.rotationManager?.startRotationUpdates()
         }
     }
+    
+    func uploadRotationImageResponseReceived() {
+        backendServiceQueue.async {
+            self.numRotationImagesReceived += 1
+            
+            if (self.numRotationImagesSent == self.numRotationImagesReceived) {
+                DispatchQueue.main.async {
+                    self.instructionLabel.text = "Image upload complete"
+                }
+            }
+        }
+    }
 }
 
 // Updates from rotation manager in rotation mode.
@@ -283,24 +298,29 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
     
     func updatedHeading(heading: Int) {
         backendServiceQueue.async {
-            if(self.sessionState != SessionState.ROTATION_STARTED) {
+            if (self.sessionState != SessionState.ROTATION_STARTED) {
                 self.sessionState = SessionState.ROTATION_STARTED
+                DispatchQueue.main.async {
+                    self.instructionLabel.text = "Rotation in progress"
+                }
             }
-            if(self.headingSet.contains(heading)) {
+            if (self.headingSet.contains(heading)) {
                 // Image uploaded given heading already.
                 return
             }
-            if(self.imagesUploadedInRotation == 1) {
-                // Already uploaded max number of images to server.
+            if (self.lastHeadingValue != -1 && abs(RotationManager.smallestDegreeDiff(self.lastHeadingValue, heading)) < 10) {
+                // Skip face detection for this heading.
                 return
             }
             
             self.detectFace(heading: heading)
             
-            self.imagesUploadedInRotation += 1
+            // Update heading values found.
             self.headingSet.insert(heading)
-            
+            self.lastHeadingValue = heading
         }
+        
+        // Update UI with heading value.
         DispatchQueue.main.async {
             self.headingLabel.text = String(heading)
         }
@@ -352,15 +372,17 @@ extension SkinToneDetectionSession: FaceContourDelegate {
     }
     
     func rotationAndWalkingFlow(uiImage: UIImage, contourPoints: ContourPoints, heading: Int) {
-        guard let userSessionService = self.userSessionService else {
+        guard let userSessionService = userSessionService else {
             print ("UserSession service not found")
             return
         }
-        userSessionService.uploadRotationImage(userSessionId: self.userSessionId, uiImage: uiImage, contourPoints: contourPoints, heading: heading)
+        if (userSessionService.uploadRotationImage(userSessionId: self.userSessionId, uiImage: uiImage, contourPoints: contourPoints, heading: heading)) {
+            numRotationImagesSent += 1
+        }
     }
 }
 
-// Responses from backend service.
+// Responses from navigation per upload flow backend service.
 extension SkinToneDetectionSession: SessionResponseHandler {
     func onSessionCreation(sessionId: String) {
         
