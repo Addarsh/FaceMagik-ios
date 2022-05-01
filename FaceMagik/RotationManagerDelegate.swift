@@ -7,4 +7,5 @@
 
 protocol RotationManagerDelegate {
     func updatedHeading(heading: Int)
+    func oneRotationComplete()
 }

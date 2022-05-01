@@ -230,6 +230,18 @@
                                 <color key="textColor" systemColor="systemBlueColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HN6-Hm-dcf">
+                                <rect key="frame" x="10" y="139" width="40" height="19"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <color key="textColor" systemColor="systemBlueColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yhd-Q9-IDo">
+                                <rect key="frame" x="60" y="139" width="40" height="19"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <color key="textColor" systemColor="systemGreenColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="5Gr-yb-vhq"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -244,8 +256,12 @@
                             <constraint firstItem="188-DI-81T" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" constant="10" id="HXD-My-t29"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="2tH-Ce-pgp" secondAttribute="trailing" constant="10" id="Jgz-r9-fco"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="6lJ-FQ-cow" secondAttribute="trailing" constant="10" id="NwJ-o7-bWV"/>
+                            <constraint firstItem="HN6-Hm-dcf" firstAttribute="bottom" secondItem="yhd-Q9-IDo" secondAttribute="bottom" id="OnS-Tp-TwW"/>
                             <constraint firstItem="2tH-Ce-pgp" firstAttribute="top" secondItem="6lJ-FQ-cow" secondAttribute="bottom" id="Ovn-YN-Tc5"/>
+                            <constraint firstItem="GvX-ey-1F1" firstAttribute="top" secondItem="HN6-Hm-dcf" secondAttribute="bottom" id="Z4I-vO-ctq"/>
+                            <constraint firstItem="yhd-Q9-IDo" firstAttribute="leading" secondItem="HN6-Hm-dcf" secondAttribute="trailing" constant="10" id="acr-0e-qUd"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="trailing" secondItem="Yts-GG-FOD" secondAttribute="trailing" id="hCc-Mi-oEr"/>
+                            <constraint firstItem="HN6-Hm-dcf" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" constant="10" id="jX5-fS-kLj"/>
                             <constraint firstItem="Yts-GG-FOD" firstAttribute="leading" secondItem="5Gr-yb-vhq" secondAttribute="leading" id="wdw-WA-OIh"/>
                             <constraint firstItem="5Gr-yb-vhq" firstAttribute="bottom" secondItem="Yts-GG-FOD" secondAttribute="bottom" constant="100" id="xjy-tm-5tp"/>
                         </constraints>
@@ -254,6 +270,8 @@
                     <connections>
                         <outlet property="cameraButton" destination="CZQ-Xl-NuB" id="7xG-a8-MIU"/>
                         <outlet property="headingLabel" destination="6lJ-FQ-cow" id="4Tf-Jw-4kI"/>
+                        <outlet property="imagesReceivedLabel" destination="yhd-Q9-IDo" id="ENW-IJ-2zD"/>
+                        <outlet property="imagesSentLabel" destination="HN6-Hm-dcf" id="MWF-Pt-A5Y"/>
                         <outlet property="instructionLabel" destination="GvX-ey-1F1" id="gBL-BY-jPq"/>
                         <outlet property="navigationLabel" destination="188-DI-81T" id="P67-69-obA"/>
                         <outlet property="previewView" destination="Yts-GG-FOD" id="RUG-NW-GIt"/>

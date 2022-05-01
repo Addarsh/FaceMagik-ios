@@ -45,6 +45,8 @@ class SkinToneDetectionSession: UIViewController {
     @IBOutlet weak var sessionLabel: UILabel!
     @IBOutlet weak var headingLabel: UILabel!
     @IBOutlet weak var instructionLabel: UILabel!
+    @IBOutlet weak var imagesSentLabel: UILabel!
+    @IBOutlet weak var imagesReceivedLabel: UILabel!
     @IBOutlet weak var navigationLabel: UILabel!
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet private var previewView: PreviewView!
@@ -124,7 +126,7 @@ class SkinToneDetectionSession: UIViewController {
         }
         
         // Display alert.
-        let alert = Utils.createWaitingAlert(message: self.INTIALIZING_ALERT)
+        let alert = Utils.createAlert(message: self.INTIALIZING_ALERT)
         self.present(alert, animated: true)
     }
     
@@ -283,8 +285,16 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
     func uploadRotationImageResponseReceived() {
         backendServiceQueue.async {
             self.numRotationImagesReceived += 1
+            DispatchQueue.main.async {
+                self.imagesReceivedLabel.text = String(self.numRotationImagesReceived)
+            }
             
-            if (self.numRotationImagesSent == self.numRotationImagesReceived) {
+            // Even though we should be comparing images sent and images received to be equal, in local testing
+            // we found that the last image sometimes takes a really long time to be received (no idea why).
+            // By checking for 1 less image received, we work around this problem without needing timeouts. The
+            // assumption here is that enough pictures have been collected till then that missing out on the final one
+            // will not affect the result.
+            if (self.numRotationImagesSent - 1 == self.numRotationImagesReceived) {
                 DispatchQueue.main.async {
                     self.instructionLabel.text = "Image upload complete"
                 }
@@ -326,8 +336,14 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
         }
     }
     
+    func oneRotationComplete() {
+        DispatchQueue.main.async {
+            self.sessionLabel.text = "Rotation Complete"
+        }
+    }
     
-    func detectFace(heading: Int) {
+    
+    private func detectFace(heading: Int) {
         guard let faceContourDetector = self.faceContourDetector else {
             print ("Face contour detector is nil")
             return
@@ -366,7 +382,7 @@ extension SkinToneDetectionSession: FaceContourDelegate {
         
         // Display alert.
         DispatchQueue.main.async {
-            let alert = Utils.createWaitingAlert(message: self.PROCESSING_ALERT)
+            let alert = Utils.createAlert(message: self.PROCESSING_ALERT)
             self.present(alert, animated: true)
         }
     }
@@ -378,6 +394,9 @@ extension SkinToneDetectionSession: FaceContourDelegate {
         }
         if (userSessionService.uploadRotationImage(userSessionId: self.userSessionId, uiImage: uiImage, contourPoints: contourPoints, heading: heading)) {
             numRotationImagesSent += 1
+            DispatchQueue.main.async {
+                self.imagesSentLabel.text = String(self.numRotationImagesSent)
+            }
         }
     }
 }

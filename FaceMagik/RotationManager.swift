@@ -11,6 +11,10 @@ class RotationManager {
     private let motionManager = CMMotionManager()
     private let updateFrequency = 1.0/30.0
     private var motionQueue = OperationQueue()
+    // Initial heading valye observed when the Motion Manager is started.
+    private var initialHeading: Int = -1
+    // Number of heading values (0-360) encountered during rotation.
+    private var numHeadingValuesSeen: Int = -1
     
     // Delegate object.
     var rotationManagerDelegate: RotationManagerDelegate?
@@ -34,7 +38,13 @@ class RotationManager {
             guard let validData = data else {
                 return
             }
+            let heading = Int(validData.heading)
+            if (self.initialHeading) == -1 {
+                self.initialHeading = heading
+            }
             self.rotationManagerDelegate?.updatedHeading(heading: Int(validData.heading))
+            self.numHeadingValuesSeen += 1
+            self.checkIfRotationIsComplete(heading: heading)
         })
     }
     
@@ -44,6 +54,14 @@ class RotationManager {
             return
         }
         self.motionManager.stopDeviceMotionUpdates()
+    }
+    
+    
+    private func checkIfRotationIsComplete(heading: Int) {
+        if (abs(RotationManager.smallestDegreeDiff(initialHeading, heading)) <= 5 && numHeadingValuesSeen >= 300) {
+            rotationManagerDelegate?.oneRotationComplete()
+            self.stopRotationUpdates()
+        }
     }
     
     // returns smallest the difference (a-b) in degrees between two angles that are close to each other taking into account roll over from 360 to 0.
