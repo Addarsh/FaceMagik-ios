@@ -8,5 +8,6 @@
 protocol UserSessionServiceDelegate {
     func onSessionCreation(userSessionId: String)
     func uploadRotationImageResponseReceived()
+    func primaryHeadingDirection(heading: Int)
 }
 

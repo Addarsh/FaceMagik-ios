@@ -34,8 +34,13 @@ class UserSessionService {
         let heading: Int
     }
     
+    struct GetRotationResultResponse: Codable {
+        let user_session_id: String
+        let primary_light_heading: Int
+    }
+    
     private let remoteEndPoint = "http://facemagik-test.eba-24rwkh9x.us-west-2.elasticbeanstalk.com"
-    private let localEndpoint = "https://9e9b-71-202-19-95.ngrok.io"
+    private let localEndpoint = "https://f40c-71-202-19-95.ngrok.io"
     
     private let localTestUserId = "86d74345-b0f0-46ab-b8bd-b94c72362079"
     private let remoteTestUserId = "9586a2ce-60d0-488f-817a-43260e40236a"
@@ -44,7 +49,7 @@ class UserSessionService {
     private var testUserId: String
     
     // Header constants.
-    let HTTP_GETD = "GET"
+    let HTTP_GET = "GET"
     let HTTP_POST = "POST"
     let APPLICATION_JSON = "application/json"
     let CONTENT_TYPE = "Content-Type"
@@ -59,6 +64,7 @@ class UserSessionService {
         self.testUserId = is_remote_endpoint ? remoteTestUserId : localTestUserId
     }
     
+    // Create new user session for given test user.
     func createUserSession() {
         let urlStr = endpoint + "/foundation/user_session/"
         guard let url = URL(string: urlStr) else {
@@ -84,7 +90,7 @@ class UserSessionService {
     }
     
     // Handle successful user session creation.
-    func onUserSessionCreation(_ data: Data) {
+    private func onUserSessionCreation(_ data: Data) {
         var userSessioCreationResponse: UserSessionCreationResponse
         do {
             userSessioCreationResponse = try JSONDecoder().decode(UserSessionCreationResponse.self, from: data)
@@ -97,6 +103,7 @@ class UserSessionService {
         userSessionServiceDelegate?.onSessionCreation(userSessionId: userSessioCreationResponse.user_session_id)
     }
     
+    // Upload rotation image to the server.
     func uploadRotationImage(userSessionId: String, uiImage: UIImage, contourPoints: ContourPoints, heading: Int) -> Bool {
         let urlStr = endpoint + "/foundation/user_session/rotation_image/"
         guard let url = URL(string: urlStr) else {
@@ -121,6 +128,31 @@ class UserSessionService {
         
         makeRequest(request: request, onSuccess: {_ in}, onReturn: {self.userSessionServiceDelegate?.uploadRotationImageResponseReceived()})
         return true
+    }
+    
+    // Fetch rotation result from server.
+    func getRotationResult(userSessionId: String) {
+        let urlStr = endpoint + "/foundation/user_session/rotation_result/?user_session_id=" + userSessionId
+        guard let url = URL(string: urlStr) else {
+            print ("Could not initialize URL string: \(urlStr)")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTP_GET
+        request.setValue(APPLICATION_JSON, forHTTPHeaderField: CONTENT_TYPE)
+        
+        makeRequest(request: request, onSuccess: onRotationResult, onReturn: {})
+    }
+    
+    private func onRotationResult(_ data: Data) {
+        var getRotationResultResponse: GetRotationResultResponse
+        do {
+            getRotationResultResponse = try JSONDecoder().decode(GetRotationResultResponse.self, from: data)
+        } catch let err {
+            print ("Error in JSON deserialization of session creation response: \(err.localizedDescription)")
+            return
+        }
+        userSessionServiceDelegate?.primaryHeadingDirection(heading: getRotationResultResponse.primary_light_heading)
     }
     
     

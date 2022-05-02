@@ -69,6 +69,7 @@ class SkinToneDetectionSession: UIViewController {
     var lastImage: CIImage?
     let PROCESSING_ALERT = "Processing..."
     let INTIALIZING_ALERT = "Initializing..."
+    let PROCESSING_IMAGES_PLEASE_WAIT = "Waiting for processing to complete..."
     
     // User Session Service variables.
     var userSessionService: UserSessionService?
@@ -265,6 +266,7 @@ class SkinToneDetectionSession: UIViewController {
 // Responses from backend UserSessionService.
 extension SkinToneDetectionSession: UserSessionServiceDelegate {
     
+    // Session creation response handler.
     func onSessionCreation(userSessionId: String) {
         backendServiceQueue.async {
             self.userSessionId = userSessionId
@@ -282,6 +284,7 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
         }
     }
     
+    // Rotation image upload response received handler.
     func uploadRotationImageResponseReceived() {
         backendServiceQueue.async {
             self.numRotationImagesReceived += 1
@@ -295,10 +298,23 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
             // assumption here is that enough pictures have been collected till then that missing out on the final one
             // will not affect the result.
             if (self.numRotationImagesSent - 1 == self.numRotationImagesReceived) {
+                // Request server to fetch Rotation result.
+                self.userSessionService?.getRotationResult(userSessionId: self.userSessionId)
+                
                 DispatchQueue.main.async {
                     self.instructionLabel.text = "Image upload complete"
+                    
+                    // Dismiss waiting alert.
+                    self.dismiss(animated: false, completion: nil)
                 }
             }
+        }
+    }
+    
+    // Rotation result response handler.
+    func primaryHeadingDirection(heading: Int) {
+        DispatchQueue.main.async {
+            self.instructionLabel.text = "Primary heading: " + String(heading)
         }
     }
 }
@@ -337,8 +353,13 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
     }
     
     func oneRotationComplete() {
+        
         DispatchQueue.main.async {
             self.sessionLabel.text = "Rotation Complete"
+            
+            // Create alert asking user to wait.
+            let alert = Utils.createAlert(message: self.PROCESSING_IMAGES_PLEASE_WAIT)
+            self.present(alert, animated: true)
         }
     }
     

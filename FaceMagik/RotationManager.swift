@@ -58,7 +58,7 @@ class RotationManager {
     
     
     private func checkIfRotationIsComplete(heading: Int) {
-        if (abs(RotationManager.smallestDegreeDiff(initialHeading, heading)) <= 5 && numHeadingValuesSeen >= 300) {
+        if (abs(RotationManager.smallestDegreeDiff(initialHeading, heading)) <= 5 && numHeadingValuesSeen >= 270) {
             rotationManagerDelegate?.oneRotationComplete()
             self.stopRotationUpdates()
         }
