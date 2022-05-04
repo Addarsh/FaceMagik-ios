@@ -32,6 +32,7 @@ class SkinToneDetectionSession: UIViewController {
         case COMPLETE
         case USER_SESSION_CREATED
         case ROTATION_STARTED
+        case ROTATION_COMPLETE
     }
     
     // Class level constant to control which flow is triggered.
@@ -42,12 +43,13 @@ class SkinToneDetectionSession: UIViewController {
     private let currentFlow = CurrentFlow.ROTATION_AND_WALKING
     
     // Outlets to Storyboard.
-    @IBOutlet weak var sessionLabel: UILabel!
     @IBOutlet weak var headingLabel: UILabel!
+    @IBOutlet weak var totalHeadingsLabel: UILabel!
     @IBOutlet weak var instructionLabel: UILabel!
     @IBOutlet weak var imagesSentLabel: UILabel!
     @IBOutlet weak var imagesReceivedLabel: UILabel!
-    @IBOutlet weak var navigationLabel: UILabel!
+    @IBOutlet weak var testLabel: UILabel!
+    var progressView: UIProgressView!
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet private var previewView: PreviewView!
     
@@ -69,13 +71,14 @@ class SkinToneDetectionSession: UIViewController {
     var lastImage: CIImage?
     let PROCESSING_ALERT = "Processing..."
     let INTIALIZING_ALERT = "Initializing..."
-    let PROCESSING_IMAGES_PLEASE_WAIT = "Waiting for processing to complete..."
+    let PROCESSING_IMAGES_PLEASE_WAIT = "Processing images..."
     
     // User Session Service variables.
     var userSessionService: UserSessionService?
     var userSessionId = ""
     var rotationManager: RotationManager?
-    var headingSet: Set<Int> = []
+    var allHeadings: Set<Int> = []
+    var headingsUploadedToServer: Set<Int> = []
     var numRotationImagesSent = 0
     var numRotationImagesReceived = 0
     var lastHeadingValue: Int = -1
@@ -86,7 +89,7 @@ class SkinToneDetectionSession: UIViewController {
         notifCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         backendService = BackendService(sessionResponseHandler: self)
         userSessionService = UserSessionService(userSessionServiceDelegate: self, is_remote_endpoint: false)
-        rotationManager = RotationManager(rotationManagerDelegate: self)
+        rotationManager = RotationManager()
         faceContourDetector = FaceContourDetector(faceContourDelegate: self)
 
         if !isCameraUseAuthorized() {
@@ -261,6 +264,11 @@ class SkinToneDetectionSession: UIViewController {
         })
     }
     
+    // Must be called in Main thread.
+    private func updateProgress(ratio: Float) {
+        self.progressView.progress = ratio
+    }
+    
 }
 
 // Responses from backend UserSessionService.
@@ -274,13 +282,14 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
         }
         
         DispatchQueue.main.async {
-            self.sessionLabel.text = "Session Started"
             // Dismiss initialization alert.
             self.dismiss(animated: false, completion: nil)
+            
+            self.instructionLabel.startBlink()
         }
         
         self.rotationManagerQueue.async {
-            self.rotationManager?.startRotationUpdates()
+            self.rotationManager?.startRotationUpdates(rotationManagerDelegate: self)
         }
     }
     
@@ -297,15 +306,22 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
             // By checking for 1 less image received, we work around this problem without needing timeouts. The
             // assumption here is that enough pictures have been collected till then that missing out on the final one
             // will not affect the result.
-            if (self.numRotationImagesSent - 1 == self.numRotationImagesReceived) {
-                // Request server to fetch Rotation result.
-                self.userSessionService?.getRotationResult(userSessionId: self.userSessionId)
-                
-                DispatchQueue.main.async {
-                    self.instructionLabel.text = "Image upload complete"
+            if (self.sessionState == SessionState.ROTATION_COMPLETE) {
+                if (self.numRotationImagesSent - 1 == self.numRotationImagesReceived) {
+                    // Request server to fetch Rotation result.
+                    self.userSessionService?.getRotationResult(userSessionId: self.userSessionId)
                     
-                    // Dismiss waiting alert.
-                    self.dismiss(animated: false, completion: nil)
+                    DispatchQueue.main.async {
+                        self.updateProgress(ratio: 1.0)
+                        self.instructionLabel.text = "Image upload complete"
+                        
+                        // Dismiss waiting alert.
+                        self.dismiss(animated: false, completion: nil)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.updateProgress(ratio: Float(self.numRotationImagesReceived)/Float(self.numRotationImagesSent))
+                    }
                 }
             }
         }
@@ -313,6 +329,11 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
     
     // Rotation result response handler.
     func primaryHeadingDirection(heading: Int) {
+        // Navigate user to heading.
+        self.rotationManagerQueue.async {
+            self.rotationManager?.navigateUserToHeading(navigateUserDelegate: self, targetHeading: heading)
+        }
+        
         DispatchQueue.main.async {
             self.instructionLabel.text = "Primary heading: " + String(heading)
         }
@@ -327,39 +348,61 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
             if (self.sessionState != SessionState.ROTATION_STARTED) {
                 self.sessionState = SessionState.ROTATION_STARTED
                 DispatchQueue.main.async {
-                    self.instructionLabel.text = "Rotation in progress"
+                    self.instructionLabel.text = "Rotate slowly towards your Right -->"
                 }
             }
-            if (self.headingSet.contains(heading)) {
+            self.allHeadings.insert(heading)
+            DispatchQueue.main.async {
+                self.totalHeadingsLabel.text = "total headings: " + String(self.allHeadings.count)
+            }
+            
+            if (self.headingsUploadedToServer.contains(heading)) {
                 // Image uploaded given heading already.
                 return
             }
-            if (self.lastHeadingValue != -1 && abs(RotationManager.smallestDegreeDiff(self.lastHeadingValue, heading)) < 10) {
-                // Skip face detection for this heading.
-                return
+            if (self.lastHeadingValue != -1) {
+                if (abs(RotationManager.smallestDegreeDiff(self.lastHeadingValue, heading)) < 10) {
+                    // Skip face detection for this heading.
+                    return
+                } else {
+                    DispatchQueue.main.async {
+                        self.instructionLabel.text = "Keep rotating..."
+                    }
+                }
             }
             
             self.detectFace(heading: heading)
             
             // Update heading values found.
-            self.headingSet.insert(heading)
+            self.headingsUploadedToServer.insert(heading)
             self.lastHeadingValue = heading
         }
         
         // Update UI with heading value.
         DispatchQueue.main.async {
-            self.headingLabel.text = String(heading)
+            self.headingLabel.text = "heading: " + String(heading)
         }
     }
     
     func oneRotationComplete() {
         
         DispatchQueue.main.async {
-            self.sessionLabel.text = "Rotation Complete"
+            
+            self.backendServiceQueue.async {
+                self.sessionState = SessionState.ROTATION_COMPLETE
+            }
             
             // Create alert asking user to wait.
             let alert = Utils.createAlert(message: self.PROCESSING_IMAGES_PLEASE_WAIT)
-            self.present(alert, animated: true)
+            self.present(alert, animated: true, completion: {
+                //  Add your progressbar after alert is shown (and measured)
+                let margin:CGFloat = 8.0
+                let rect = CGRect(x: margin, y: 0.0, width: alert.view.frame.width - margin * 2.0 , height: 2.0)
+                self.progressView = UIProgressView(frame: rect)
+                self.progressView!.progress = 0.5
+                self.progressView!.tintColor = .green
+                alert.view.addSubview(self.progressView!)
+            })
         }
     }
     
@@ -381,6 +424,37 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
     }
 }
 
+// Updates from rotation manager during user navigation to heading.
+extension SkinToneDetectionSession: NavigateUserDelegate {
+    func updatedHeadingValues(heading: Int) {
+        // Update UI with heading value.
+        DispatchQueue.main.async {
+            self.headingLabel.text = "heading: " + String(heading)
+        }
+    }
+    
+    // Ask user to start rotating in given direction.
+    func startRotation(direction: RotationManager.Direction, deltaDegrees: Int) {
+        DispatchQueue.main.async {
+            self.instructionLabel.text = self.expectedNavigationText(direction: direction)
+            self.testLabel.text = "Diff: " + String(deltaDegrees)
+        }
+    }
+    
+    // Stop Rotation when user reaches target heading.
+    func stopRotation() {
+        DispatchQueue.main.async {
+            self.instructionLabel.text = "Stop"
+        }
+    }
+    
+    private func expectedNavigationText(direction: RotationManager.Direction) -> String {
+        if (direction == RotationManager.Direction.CLOCKWISE) {
+            return "Rotate slowly to your right -->"
+        }
+        return "Rotate slowly to your left <---"
+    }
+}
 
 // Updates for detected contours of given image.
 extension SkinToneDetectionSession: FaceContourDelegate {
@@ -432,7 +506,6 @@ extension SkinToneDetectionSession: SessionResponseHandler {
         }
         
         DispatchQueue.main.async {
-            self.sessionLabel.text = "Session Running"
             // Dismiss initialization alert.
             self.dismiss(animated: false, completion: nil)
         }
@@ -444,7 +517,7 @@ extension SkinToneDetectionSession: SessionResponseHandler {
             self.lastInstruction = instruction
             
             DispatchQueue.main.async {
-                self.navigationLabel.text = instruction
+                // Show navigation instruction in a UILabel here.
                 // Dismiss processing alert.
                 self.dismiss(animated: false, completion: nil)
             }

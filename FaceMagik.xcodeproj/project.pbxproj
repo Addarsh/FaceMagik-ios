@@ -30,6 +30,7 @@
 		98D8B2CD281B3E5100592E78 /* UserSessionServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */; };
 		98D8B2CF281B5D9900592E78 /* RotationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2CE281B5D9800592E78 /* RotationManager.swift */; };
 		98D8B2D1281B5E2700592E78 /* RotationManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2D0281B5E2700592E78 /* RotationManagerDelegate.swift */; };
+		98D8B2D3281F6A5D00592E78 /* NavigateUserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D8B2D2281F6A5D00592E78 /* NavigateUserDelegate.swift */; };
 		994D42197966AF4D3F6C9384 /* Pods_FaceMagik_FaceMagikUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D840143DB80361451B66E32B /* Pods_FaceMagik_FaceMagikUITests.framework */; };
 		A6EE91A8E0CE4421C8DCD558 /* Pods_FaceMagik.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E3D0250BF99176CD9452B /* Pods_FaceMagik.framework */; };
 /* End PBXBuildFile section */
@@ -83,6 +84,7 @@
 		98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSessionServiceDelegate.swift; sourceTree = "<group>"; };
 		98D8B2CE281B5D9800592E78 /* RotationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotationManager.swift; sourceTree = "<group>"; };
 		98D8B2D0281B5E2700592E78 /* RotationManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotationManagerDelegate.swift; sourceTree = "<group>"; };
+		98D8B2D2281F6A5D00592E78 /* NavigateUserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigateUserDelegate.swift; sourceTree = "<group>"; };
 		BC5CD5A31F30FA87E12FA1CA /* Pods-FaceMagikTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagikTests.release.xcconfig"; path = "Target Support Files/Pods-FaceMagikTests/Pods-FaceMagikTests.release.xcconfig"; sourceTree = "<group>"; };
 		C711CE50A3DC8FEFB9E50400 /* Pods-FaceMagik-FaceMagikUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagik-FaceMagikUITests.debug.xcconfig"; path = "Target Support Files/Pods-FaceMagik-FaceMagikUITests/Pods-FaceMagik-FaceMagikUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		D7F6706275003A5B3CBEF573 /* Pods-FaceMagik.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FaceMagik.debug.xcconfig"; path = "Target Support Files/Pods-FaceMagik/Pods-FaceMagik.debug.xcconfig"; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				98D8B2CC281B3E5100592E78 /* UserSessionServiceDelegate.swift */,
 				98D8B2CE281B5D9800592E78 /* RotationManager.swift */,
 				98D8B2D0281B5E2700592E78 /* RotationManagerDelegate.swift */,
+				98D8B2D2281F6A5D00592E78 /* NavigateUserDelegate.swift */,
 				986A651B27ED5DC40002770F /* BackendService.swift */,
 				986A651D27EE77690002770F /* SessionResponseHandler.swift */,
 				986A652527FF40640002770F /* FaceContourUtils.swift */,
@@ -496,6 +499,7 @@
 				98D8B2CD281B3E5100592E78 /* UserSessionServiceDelegate.swift in Sources */,
 				986A651C27ED5DC40002770F /* BackendService.swift in Sources */,
 				986A652227F052A40002770F /* FaceContourDetector.swift in Sources */,
+				98D8B2D3281F6A5D00592E78 /* NavigateUserDelegate.swift in Sources */,
 				98D8B2CB281B238700592E78 /* UserSessionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
