@@ -33,6 +33,7 @@ class SkinToneDetectionSession: UIViewController {
         case USER_SESSION_CREATED
         case ROTATION_STARTED
         case ROTATION_COMPLETE
+        case NAVIGATION_STARTED
     }
     
     // Class level constant to control which flow is triggered.
@@ -120,17 +121,22 @@ class SkinToneDetectionSession: UIViewController {
                     return
                 }
                 backendService.createSkinToneSession()
-            } else {
-                guard let userSessionService = self.userSessionService else {
-                    print ("UserSession service not found")
-                    return
-                }
-                userSessionService.createUserSession()
             }
         }
         
-        // Display alert.
-        let alert = Utils.createAlert(message: self.INTIALIZING_ALERT)
+        // Provide instruction to user.
+        let alert = Utils.createInstuctionAlert(message: "Start rotating slowly in the clockwise direction(-->) as we assess lighting conditions.", completionHandler: { _ in
+            // Start user session.
+            self.backendServiceQueue.async {
+                if (self.currentFlow == CurrentFlow.ROTATION_AND_WALKING) {
+                    guard let userSessionService = self.userSessionService else {
+                        print ("UserSession service not found")
+                        return
+                    }
+                    userSessionService.createUserSession()
+                }
+            }
+        })
         self.present(alert, animated: true)
     }
     
@@ -282,9 +288,6 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
         }
         
         DispatchQueue.main.async {
-            // Dismiss initialization alert.
-            self.dismiss(animated: false, completion: nil)
-            
             self.instructionLabel.startBlink()
         }
         
@@ -313,7 +316,6 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
                     
                     DispatchQueue.main.async {
                         self.updateProgress(ratio: 1.0)
-                        self.instructionLabel.text = "Image upload complete"
                         
                         // Dismiss waiting alert.
                         self.dismiss(animated: false, completion: nil)
@@ -329,13 +331,25 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
     
     // Rotation result response handler.
     func primaryHeadingDirection(heading: Int) {
-        // Navigate user to heading.
-        self.rotationManagerQueue.async {
-            self.rotationManager?.navigateUserToHeading(navigateUserDelegate: self, targetHeading: heading)
-        }
+        // Sleep for 0.5 seconds. This is to give enough time for previous alert to be dismissed without dismissing the whole app instead.
+        Thread.sleep(forTimeInterval: 0.5)
         
         DispatchQueue.main.async {
-            self.instructionLabel.text = "Primary heading: " + String(heading)
+            // Provide instruction to user.
+            let alert = Utils.createInstuctionAlert(message: "Follow instructions to face the direction of light. Keep rotating until instructed to stop.", completionHandler: { _ in
+                // Start navigation session.
+                self.rotationManagerQueue.async {
+                    self.rotationManager?.navigateUserToHeading(navigateUserDelegate: self, targetHeading: heading)
+                }
+                self.backendServiceQueue.async {
+                    self.sessionState = SessionState.NAVIGATION_STARTED
+                    DispatchQueue.main.async {
+                        self.instructionLabel.startBlink()
+                    }
+                }
+            })
+            
+            self.present(alert, animated: true)
         }
     }
 }
@@ -384,6 +398,7 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
         }
     }
     
+    // Handler to respond to rotation completion event.
     func oneRotationComplete() {
         
         DispatchQueue.main.async {
@@ -392,14 +407,20 @@ extension SkinToneDetectionSession: RotationManagerDelegate {
                 self.sessionState = SessionState.ROTATION_COMPLETE
             }
             
+            // Clear instruction text.
+            DispatchQueue.main.async {
+                self.instructionLabel.text = ""
+                self.instructionLabel.stopBlink()
+            }
+            
             // Create alert asking user to wait.
-            let alert = Utils.createAlert(message: self.PROCESSING_IMAGES_PLEASE_WAIT)
+            let alert = Utils.createProcessingAlert(message: self.PROCESSING_IMAGES_PLEASE_WAIT)
             self.present(alert, animated: true, completion: {
-                //  Add your progressbar after alert is shown (and measured)
+                //  Add your progressbar after alert is shown (and measured).
                 let margin:CGFloat = 8.0
-                let rect = CGRect(x: margin, y: 0.0, width: alert.view.frame.width - margin * 2.0 , height: 2.0)
+                let rect = CGRect(x: margin, y: 50, width: alert.view.frame.width - margin * 2.0 , height: 2.0)
                 self.progressView = UIProgressView(frame: rect)
-                self.progressView!.progress = 0.5
+                self.progressView!.progress = 0.0
                 self.progressView!.tintColor = .green
                 alert.view.addSubview(self.progressView!)
             })

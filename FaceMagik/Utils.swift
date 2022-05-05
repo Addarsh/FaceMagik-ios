@@ -31,6 +31,33 @@ class Utils {
         return alert
     }
     
+    static func createInstuctionAlert(message: String, completionHandler: @escaping (UIAlertAction) -> Void) -> UIAlertController {
+        let alert = UIAlertController(title: "Instructions", message: message, preferredStyle: .alert)
+        
+        let height :NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 200)
+        alert.view.addConstraint(height)
+        
+        let startAction = UIAlertAction(title: "Start", style: .default, handler: completionHandler)
+        
+        alert.addAction(startAction)
+        return alert
+    }
+    
+    // Alert with loading indicator.
+    static func createProcessingAlert(message: String) -> UIAlertController {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let height :NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 100)
+        alert.view.addConstraint(height)
+
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.style = UIActivityIndicatorView.Style.medium
+        loadingIndicator.startAnimating();
+
+        alert.view.addSubview(loadingIndicator)
+        return alert
+    }
+    
     static func toUIImage(ciImage: CIImage, resizedWidth: Int) -> UIImage? {
        return UIImage(ciImage: ciImage).resized(toWidth: CGFloat(resizedWidth))
     }
