@@ -56,7 +56,7 @@ class RotationManager {
             self.headingSet.insert(heading)
             rotationManagerDelegate?.updatedHeading(heading: Int(validData.heading))
             
-            self.checkIfRotationIsComplete(rotationManagerDelegate: rotationManagerDelegate, heading: heading)
+            self.checkIfRotationIsComplete(rotationManagerDelegate: rotationManagerDelegate)
         })
     }
     
@@ -70,7 +70,7 @@ class RotationManager {
             navigateUserDelegate.updatedHeadingValues(heading: heading)
             
             let smallestDegreeDiff = RotationManager.smallestDegreeDiff(targetHeading, heading)
-            if (abs(smallestDegreeDiff) <= 5) {
+            if (abs(smallestDegreeDiff) <= 10) {
                 // User has reached target heading.
                 navigateUserDelegate.stopRotation()
                 return
@@ -93,11 +93,31 @@ class RotationManager {
     }
     
     
-    private func checkIfRotationIsComplete(rotationManagerDelegate: RotationManagerDelegate?, heading: Int) {
-        if (abs(RotationManager.smallestDegreeDiff(initialHeading, heading)) <= 5 && headingSet.count >= 270) {
-            rotationManagerDelegate?.oneRotationComplete()
-            self.stopRotationUpdates()
+    private func checkIfRotationIsComplete(rotationManagerDelegate: RotationManagerDelegate?) {
+        // Ensure that each quadrant (0-90, 90-180, 180-270, 270-360) has enough heading density.
+        let sortedHeadings = Array(headingSet).sorted()
+        var headingBuckets: [[Int]] = [[], [], [], []]
+        for heading in sortedHeadings {
+            let quadrant = Int(heading / 90)
+            if (quadrant > 3) {
+                // Shouldn't happen but a safeguard in case 360 is a valid heading value.
+                continue
+            }
+            headingBuckets[quadrant].append(heading)
         }
+        for bucket in headingBuckets {
+            if (bucket.count < 50) {
+                // Too few points in quadrant.
+                return
+            }
+            let range = bucket.last! - bucket.first!
+            if (range < 70) {
+                // Range covered is too less.
+                return
+            }
+        }
+        rotationManagerDelegate?.oneRotationComplete()
+        self.stopRotationUpdates()
     }
     
     // returns smallest the difference (a-b) in degrees between two angles that are close to each other taking into account roll over from 360 to 0.
