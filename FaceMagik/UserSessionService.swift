@@ -40,7 +40,7 @@ class UserSessionService {
     }
     
     private let remoteEndPoint = "http://facemagik-test.eba-24rwkh9x.us-west-2.elasticbeanstalk.com"
-    private let localEndpoint = "https://085d-71-202-19-95.ngrok.io"
+    private let localEndpoint = "https://3dc5-71-202-19-95.ngrok.io"
     
     private let localTestUserId = "86d74345-b0f0-46ab-b8bd-b94c72362079"
     private let remoteTestUserId = "9586a2ce-60d0-488f-817a-43260e40236a"

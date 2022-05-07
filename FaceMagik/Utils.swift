@@ -31,13 +31,13 @@ class Utils {
         return alert
     }
     
-    static func createInstuctionAlert(message: String, completionHandler: @escaping (UIAlertAction) -> Void) -> UIAlertController {
+    static func createInstructionAlert(message: String, actionMessage: String, completionHandler: @escaping (UIAlertAction) -> Void) -> UIAlertController {
         let alert = UIAlertController(title: "Instructions", message: message, preferredStyle: .alert)
         
         let height :NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 200)
         alert.view.addConstraint(height)
         
-        let startAction = UIAlertAction(title: "Start", style: .default, handler: completionHandler)
+        let startAction = UIAlertAction(title: actionMessage, style: .default, handler: completionHandler)
         
         alert.addAction(startAction)
         return alert

@@ -8,6 +8,7 @@
 protocol NavigateUserDelegate {
     func updatedHeadingValues(heading: Int)
     func startRotation(direction: RotationManager.Direction, deltaDegrees: Int)
-    func stopRotation()
+    func targetHeadingReached()
+    func navigationComplete()
 }
 

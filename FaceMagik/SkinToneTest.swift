@@ -125,7 +125,7 @@ class SkinToneDetectionSession: UIViewController {
         }
         
         // Provide instruction to user.
-        let alert = Utils.createInstuctionAlert(message: "Start rotating slowly in the clockwise direction(-->) as we assess lighting conditions.", completionHandler: { _ in
+        let alert = Utils.createInstructionAlert(message: "Start rotating slowly in the clockwise direction(-->) as we assess lighting conditions.", actionMessage: "Start",  completionHandler: { _ in
             // Start user session.
             self.backendServiceQueue.async {
                 if (self.currentFlow == CurrentFlow.ROTATION_AND_WALKING) {
@@ -336,7 +336,7 @@ extension SkinToneDetectionSession: UserSessionServiceDelegate {
         
         DispatchQueue.main.async {
             // Provide instruction to user.
-            let alert = Utils.createInstuctionAlert(message: "Follow instructions to face the direction of light. Keep rotating until instructed to stop.", completionHandler: { _ in
+            let alert = Utils.createInstructionAlert(message: "Good job! We will direct you to face the direction of light. Keep rotating until you see a Stop instruction.", actionMessage: "OK", completionHandler: { _ in
                 // Start navigation session.
                 self.rotationManagerQueue.async {
                     self.rotationManager?.navigateUserToHeading(navigateUserDelegate: self, targetHeading: heading)
@@ -462,10 +462,24 @@ extension SkinToneDetectionSession: NavigateUserDelegate {
         }
     }
     
-    // Stop Rotation when user reaches target heading.
-    func stopRotation() {
+    // User reaches target heading.
+    func targetHeadingReached() {
         DispatchQueue.main.async {
+            // Display Stop instruction to user.
             self.instructionLabel.text = "Stop"
+        }
+    }
+    
+    // Navigation complete.
+    func navigationComplete() {
+        // Display alert.
+        DispatchQueue.main.async {
+            let alert = Utils.createInstructionAlert(message: "Good job! Now you are facing the direction of light. Smile showing your teeth :D and let's take a picture!", actionMessage: "Say Cheese!", completionHandler: { _ in
+                self.backendServiceQueue.async {
+                    // Call backend with the picture.
+                }
+            })
+            self.present(alert, animated: true)
         }
     }
     

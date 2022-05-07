@@ -28,6 +28,8 @@ class RotationManager {
     // Navigation mode variables.
     private var prevNavHeading: Int = -1
     private var prevDegreesDiff: Int = 360
+    // Number of consecutive headings where navgation instruction is "Stop".
+    private var consecutiveStopCount: Int = 0
     
     
     init() {
@@ -72,8 +74,17 @@ class RotationManager {
             let smallestDegreeDiff = RotationManager.smallestDegreeDiff(targetHeading, heading)
             if (abs(smallestDegreeDiff) <= 10) {
                 // User has reached target heading.
-                navigateUserDelegate.stopRotation()
+                self.consecutiveStopCount += 1
+                // Hoping roughly 2 seonds since update frequency is 30Hz.
+                if (self.consecutiveStopCount >= 60) {
+                    navigateUserDelegate.navigationComplete()
+                    self.stopRotationUpdates()
+                } else {
+                    navigateUserDelegate.targetHeadingReached()
+                }
                 return
+            } else {
+                self.consecutiveStopCount = 0
             }
             var navigationDirection: Direction = Direction.CLOCKWISE
             if (smallestDegreeDiff < 0) {
